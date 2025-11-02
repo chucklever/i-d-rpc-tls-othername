@@ -184,6 +184,48 @@ The server performs identity squashing only if it successfully validates
 an identity squashing otherName field and authorizes its use for the
 authenticated TLS peer.
 
+## Server Processing
+
+This section provides a non-normative example of how an RPC server
+implementation might process identity squashing otherName fields.
+Implementers are free to use alternative approaches.
+
+A typical server processing flow might include these steps:
+
+1. During TLS session establishment, extract and validate the client's
+X.509 certificate according to {{RFC5280}} and {{RFC9289}}.
+
+1. If the certificate contains a SubjectAltName extension, examine each
+otherName entry to determine if any contain identity squashing type-id
+values (id-on-rpcAuthSys, id-on-gssExportedName, or id-on-nfsv4Principal).
+
+1. If exactly one identity squashing otherName is found, extract and parse
+the identity information according to the ASN.1 definition for that type-id.
+If parsing fails, reject the certificate.
+
+1. Perform authorization checks to determine whether the authenticated TLS
+peer is permitted to use the specified identity. This might involve:
+   - Consulting an access control list mapping certificate subjects to
+     allowed user identities
+   - Verifying that the requested UID/GID values are within acceptable ranges
+   - Validating that the user@domain string matches expected domain patterns
+   - Checking that the GSS-API mechanism is trusted and the principal is
+     authorized
+
+1. If authorization succeeds, associate the extracted identity with the TLS
+session state.
+
+1. For each incoming RPC request on this TLS session, replace the credential
+information in the RPC header with the identity extracted from the certificate.
+The original credential information in the RPC header is ignored.
+
+1. Process the RPC request using the squashed identity for all authorization
+and access control decisions.
+
+Implementations should consider caching the parsed and validated identity
+information at TLS session establishment time to avoid repeated parsing
+for each RPC request.
+
 ## Interoperability with Non-Supporting Servers
 
 RPC servers that do not implement this specification will not recognize
