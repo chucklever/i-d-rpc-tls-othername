@@ -142,12 +142,58 @@ As specified in {{Section 4.2.1.6 of !RFC5280}}:
 > indicated through the OBJECT IDENTIFIER in the type-id field.  The
 > name itself is conveyed as value field in otherName.
 
+A SubjectAltName extension MAY contain multiple entries of different types
+(e.g., dNSName, iPAddress, otherName). When processing a certificate for
+identity squashing purposes, the server examines only the otherName entries
+with type-id values defined in this document. Other SubjectAltName entries
+are used for their normal purposes (such as hostname verification for TLS).
+
 This document specifies new uses of the otherName field to carry an
 RPC user identity. The receiving system (an RPC server) then
 replaces the RPC user, as carried in the RPC header credential and
 verifier fields in each RPC request within the TLS session, with the
 user identity specified in the certificate used to authenticate that
 session.
+
+## Server Processing of otherName Fields
+
+When an RPC server receives a client certificate containing a
+SubjectAltName extension, it MUST process the otherName fields as
+follows:
+
+1. The server MUST examine all otherName entries in the SubjectAltName
+extension.
+
+1. If the server finds an otherName with a type-id that matches one of
+the identity squashing OIDs defined in this document (id-on-rpcAuthSys,
+id-on-gssExportedName, or id-on-nfsv4Principal), it SHOULD extract
+and validate the identity information from that otherName.
+
+1. If multiple identity squashing otherName fields are present in the
+same SubjectAltName extension, the server MUST reject the certificate
+to avoid ambiguity. See {{sec-security-considerations}} for details.
+
+1. If the server encounters otherName entries with type-id values it does
+not recognize, it MUST ignore those entries and continue processing.
+This ensures forward compatibility with future extensions.
+
+1. Other types of SubjectAltName entries (dNSName, iPAddress, etc.) are
+processed independently and do not affect identity squashing behavior.
+
+The server performs identity squashing only if it successfully validates
+an identity squashing otherName field and authorizes its use for the
+authenticated TLS peer.
+
+## Interoperability with Non-Supporting Servers
+
+RPC servers that do not implement this specification will not recognize
+the otherName OIDs defined in this document. Such servers MUST ignore
+unrecognized otherName entries per {{Section 4.2.1.6 of RFC5280}}.
+These servers will process RPC requests using the credential information
+contained in the RPC header, subject to their normal authentication and
+authorization policies. This ensures that clients presenting certificates
+with identity squashing otherName fields can interoperate with servers
+that do not support this specification, though without identity squashing.
 
 ## AUTH_SYS Identities
 
