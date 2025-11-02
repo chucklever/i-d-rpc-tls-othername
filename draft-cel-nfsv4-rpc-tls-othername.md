@@ -848,6 +848,122 @@ E3 81 88 2E 6A 70
 Note: The UTF-8 encoding of the Chinese characters "用户" is
 E7 94 A8 E6 88 B7, and the Japanese text "例え" is E4 BE 8B E3 81 88.
 
+## Test Vectors
+
+This section provides test vectors for validating implementations.
+Each test case includes the input values, expected ASN.1 structure,
+and expected DER encoding.
+
+### Valid NFSv4Principal Test Cases
+
+Test Case 1: Simple ASCII user and domain
+
+Input:
+
+- user: "bob"
+- domain: "example.org"
+
+Expected DER encoding:
+
+~~~
+30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
+0C 03 62 6F 62 13 01 40 0C 0B 65 78 61 6D 70 6C
+65 2E 6F 72 67
+~~~
+
+Test Case 2: User with numbers and domain with subdomain
+
+Input:
+
+- user: "user123"
+- domain: "nfs.lab.example.com"
+
+Expected DER encoding:
+
+~~~
+30 2F A0 2D 06 08 2B 06 01 05 05 07 08 XX A0 21
+0C 07 75 73 65 72 31 32 33 13 01 40 0C 14 6E 66
+73 2E 6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F
+6D
+~~~
+
+### Valid RPCAuthSys Test Cases
+
+Test Case 1: Single user, single group
+
+Input:
+
+- uid: 1000
+- gids: { 1000 }
+
+Expected DER encoding:
+
+~~~
+30 13 A0 11 06 08 2B 06 01 05 05 07 08 ZZ A0 05
+30 08 02 02 03 E8 30 04 02 02 03 E8
+~~~
+
+Test Case 2: User with empty group list
+
+Input:
+
+- uid: 500
+- gids: (empty)
+
+Expected DER encoding:
+
+~~~
+30 0F A0 0D 06 08 2B 06 01 05 05 07 08 ZZ A0 01
+30 06 02 02 01 F4 30 00
+~~~
+
+Test Case 3: User with maximum 32-bit UID and multiple groups
+
+Input:
+
+- uid: 4294967295
+- gids: { 1, 10, 100, 1000 }
+
+Expected DER encoding:
+
+~~~
+30 24 A0 22 06 08 2B 06 01 05 05 07 08 ZZ A0 16
+30 14 02 05 00 FF FF FF FF 30 0B 02 01 01 02 01
+0A 02 01 64 02 02 03 E8
+~~~
+
+### Invalid Test Cases
+
+These test cases should be rejected by conforming implementations:
+
+Test Case 1: NFSv4Principal with missing atSign field
+
+Input (malformed):
+
+- user: "alice"
+- atSign: "" (empty)
+- domain: "example.com"
+
+Expected result: Parsing failure
+
+Test Case 2: RPCAuthSys with UID exceeding 32-bit range
+
+Input (malformed):
+
+- uid: 4294967296 (2^32)
+- gids: { 1000 }
+
+Expected result: Encoding failure or rejection
+
+Test Case 3: Certificate with multiple identity squashing otherNames
+
+Input (malformed):
+SubjectAltName containing both:
+- id-on-nfsv4Principal with user "alice@example.com"
+- id-on-rpcAuthSys with uid 1000
+
+Expected result: Certificate rejection per Security Considerations
+
 # Acknowledgments
 {:numbered="false"}
 
