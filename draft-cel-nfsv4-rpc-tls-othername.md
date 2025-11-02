@@ -113,14 +113,6 @@ field when "type-id" carries the new object identifier.
 The document also provides normative guidance on how the "value"
 is to be interpreted by RPC servers.
 
-## Open Questions
-
-- Should this be an NFS-only feature, or should it be an RPC-layer
-  feature?
-
-- Standardizing a fixed OID is necessary for interoperability, but
-  are we required to allocate that OID from a particular arc?
-
 # Requirements Language
 
 {::boilerplate bcp14-tagged}
