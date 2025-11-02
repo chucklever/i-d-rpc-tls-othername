@@ -144,8 +144,10 @@ As specified in {{Section 4.2.1.6 of !RFC5280}}:
 
 This document specifies new uses of the otherName field to carry an
 RPC user identity. The receiving system (an RPC server) then
-converts all RPC users (as carried in the RPC header credential and
-verifier fields) to the user identity specified in the certificate.
+replaces the RPC user, as carried in the RPC header credential and
+verifier fields in each RPC request within the TLS session, with the
+user identity specified in the certificate used to authenticate that
+session.
 
 ## AUTH_SYS Identities
 
@@ -173,6 +175,15 @@ verifier fields) to the user identity specified in the certificate.
 
 The otherName value contains a principal name as described in
 {{Section 4 of !RFC2743}}.
+
+What you'll need to define in your RFC:
+
+1. Scope & Use Cases: When/why to use GSS principals in certificates
+2. Security Considerations: Trust relationships, name canonicalization
+3. Mechanism Requirements: What each GSS mechanism must specify for nameValue encoding
+4. Name Matching: How to compare two GSSExportedName values
+5. IANA Considerations: OID assignment request
+6. Examples: Kerberos principals, SPKM, etc.
 
 ## NFSv4 User @ Domain String Identities
 
@@ -244,12 +255,149 @@ Implementation experience:
 
 # Security Considerations
 
-# IANA Considerations
+# IANA Considerations {#sec-iana-considerations}
 
 {:aside}
 > Insert request for allocations of a SubjectAltName : otherName object identifiers
 
 --- back
+
+# ASN.1 Modules
+
+The following ASN.1 modules normatively specify the structure of
+the new otherName values described in this document.
+This specification uses the ASN.1 definitions from
+{{?RFC5912}} with the 2002 ASN.1 notation used in that document.
+{{RFC5912}} updates normative documents using older ASN.1 notation.
+
+## The RpcAuthSysUser
+
+~~~ ASN.1
+RPCAuthSysCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-rpc-auth-sys(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for RPC AUTH_SYS credentials in otherName
+id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- RPC AUTH_SYS Credentials Structure
+-- UID and GID list as used in RPC AUTH_SYS authentication flavor
+RPCAuthSys ::= SEQUENCE {
+    uid        INTEGER (0..4294967295),  -- 32-bit UID
+    gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs
+}
+
+-- For use in SubjectAltName otherName
+rpcAuthSys OTHER-NAME ::= {
+    RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
+}
+
+END
+~~~
+
+## The RpcGssUser
+
+~~~ ASN.1
+GSSAPIPrincipalCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-gss-exported-name(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for GSS-API Exported Name in otherName
+id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- GSS-API Exported Name Structure
+GSSExportedName ::= SEQUENCE {
+    nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
+    nameValue  OCTET STRING        -- Mechanism-specific exported name
+}
+
+-- For use in SubjectAltName otherName
+gssExportedName OTHER-NAME ::= {
+    GSSExportedName IDENTIFIED BY id-on-gssExportedName
+}
+
+END
+~~~
+
+## The RpcNfsv4User
+
+~~~ ASN.1
+NFSv4PrincipalCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-nfsv4-principal(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for NFSv4 user@domain principal in otherName
+id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- NFSv4 User@Domain Principal Structure
+-- As defined in RFC 8881 Section 5.9
+NFSv4Principal ::= SEQUENCE {
+    user       UTF8String,
+    atSign     IA5String (SIZE (1)) (FROM ("@")),
+    domain     UTF8String  -- Supports internationalized domain names
+}
+
+-- For use in SubjectAltName otherName
+nfsv4Principal OTHER-NAME ::= {
+    NFSv4Principal IDENTIFIED BY id-on-nfsv4Principal
+}
+
+END
+~~~
 
 # Acknowledgments
 {:numbered="false"}
