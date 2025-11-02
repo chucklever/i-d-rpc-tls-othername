@@ -5,8 +5,8 @@
 Network File System Version 4                                 R. Macklem
 Internet-Draft                                                   FreeBSD
 Intended status: Standards Track                           C. Lever, Ed.
-Expires: 1 February 2026                                          Oracle
-                                                            31 July 2025
+Expires: 6 May 2026                                               Oracle
+                                                         2 November 2025
 
 
  Remote Procedure Call Identity Squashing via x.509 Certificate Fields
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 February 2026.
+   This Internet-Draft will expire on 6 May 2026.
 
 Copyright Notice
 
@@ -94,6 +94,10 @@ Table of Contents
    8.  References
      8.1.  Normative References
      8.2.  Informative References
+   Appendix A.  ASN.1 Modules
+     A.1.  The RpcAuthSysUser
+     A.2.  The RpcGssUser
+     A.3.  The RpcNfsv4User
    Acknowledgments
    Authors' Addresses
 
@@ -184,8 +188,10 @@ Table of Contents
 
    This document specifies new uses of the otherName field to carry an
    RPC user identity.  The receiving system (an RPC server) then
-   converts all RPC users (as carried in the RPC header credential and
-   verifier fields) to the user identity specified in the certificate.
+   replaces the RPC user, as carried in the RPC header credential and
+   verifier fields in each RPC request within the TLS session, with the
+   user identity specified in the certificate used to authenticate that
+   session.
 
 3.1.  AUTH_SYS Identities
 
@@ -211,6 +217,22 @@ Table of Contents
 
    The otherName value contains a principal name as described in
    Section 4 of [RFC2743].
+
+   What you'll need to define in your RFC:
+
+   1.  Scope & Use Cases: When/why to use GSS principals in certificates
+
+   2.  Security Considerations: Trust relationships, name
+       canonicalization
+
+   3.  Mechanism Requirements: What each GSS mechanism must specify for
+       nameValue encoding
+
+   4.  Name Matching: How to compare two GSSExportedName values
+
+   5.  IANA Considerations: OID assignment request
+
+   6.  Examples: Kerberos principals, SPKM, etc.
 
 3.3.  NFSv4 User @ Domain String Identities
 
@@ -319,6 +341,11 @@ Table of Contents
               Specification Version 2", RFC 5531, DOI 10.17487/RFC5531,
               May 2009, <https://www.rfc-editor.org/rfc/rfc5531>.
 
+   [RFC5912]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for the
+              Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
+              DOI 10.17487/RFC5912, June 2010,
+              <https://www.rfc-editor.org/rfc/rfc5912>.
+
    [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
               Version 4 Minor Version 1 Protocol", RFC 8881,
               DOI 10.17487/RFC8881, August 2020,
@@ -329,6 +356,137 @@ Table of Contents
               server/identity/ad-ds/manage/understand-security-
               identifiers>.  Replace this with a reference to an MS
               standards doc
+
+Appendix A.  ASN.1 Modules
+
+   The following ASN.1 modules normatively specify the structure of the
+   new otherName values described in this document.  This specification
+   uses the ASN.1 definitions from [RFC5912] with the 2002 ASN.1
+   notation used in that document.  [RFC5912] updates normative
+   documents using older ASN.1 notation.
+
+A.1.  The RpcAuthSysUser
+
+   RPCAuthSysCertExtn
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-rpc-auth-sys(TBD) }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+   BEGIN
+
+   IMPORTS
+       OTHER-NAME
+       FROM PKIX1Implicit-2009
+           { iso(1) identified-organization(3) dod(6) internet(1)
+             security(5) mechanisms(5) pkix(7) id-mod(0)
+             id-mod-pkix1-implicit-02(59) } ;
+
+   -- Object Identifier Arc
+   id-pkix OBJECT IDENTIFIER ::=
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) }
+
+   id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+   -- OID for RPC AUTH_SYS credentials in otherName
+   id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
+
+   -- RPC AUTH_SYS Credentials Structure
+   -- UID and GID list as used in RPC AUTH_SYS authentication flavor
+   RPCAuthSys ::= SEQUENCE {
+       uid        INTEGER (0..4294967295),  -- 32-bit UID
+       gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs
+   }
+
+   -- For use in SubjectAltName otherName
+   rpcAuthSys OTHER-NAME ::= {
+       RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
+   }
+
+   END
+
+A.2.  The RpcGssUser
+
+   GSSAPIPrincipalCertExtn
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-gss-exported-name(TBD) }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+   BEGIN
+
+   IMPORTS
+       OTHER-NAME
+       FROM PKIX1Implicit-2009
+           { iso(1) identified-organization(3) dod(6) internet(1)
+             security(5) mechanisms(5) pkix(7) id-mod(0)
+             id-mod-pkix1-implicit-02(59) } ;
+
+   -- Object Identifier Arc
+   id-pkix OBJECT IDENTIFIER ::=
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) }
+
+   id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+   -- OID for GSS-API Exported Name in otherName
+   id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
+
+   -- GSS-API Exported Name Structure
+   GSSExportedName ::= SEQUENCE {
+       nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
+       nameValue  OCTET STRING        -- Mechanism-specific exported name
+   }
+
+   -- For use in SubjectAltName otherName
+   gssExportedName OTHER-NAME ::= {
+       GSSExportedName IDENTIFIED BY id-on-gssExportedName
+   }
+
+   END
+
+A.3.  The RpcNfsv4User
+
+   NFSv4PrincipalCertExtn
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) id-mod(0)
+         id-mod-nfsv4-principal(TBD) }
+
+   DEFINITIONS IMPLICIT TAGS ::=
+   BEGIN
+
+   IMPORTS
+       OTHER-NAME
+       FROM PKIX1Implicit-2009
+           { iso(1) identified-organization(3) dod(6) internet(1)
+             security(5) mechanisms(5) pkix(7) id-mod(0)
+             id-mod-pkix1-implicit-02(59) } ;
+
+   -- Object Identifier Arc
+   id-pkix OBJECT IDENTIFIER ::=
+       { iso(1) identified-organization(3) dod(6) internet(1)
+         security(5) mechanisms(5) pkix(7) }
+
+   id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+   -- OID for NFSv4 user@domain principal in otherName
+   id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
+
+   -- NFSv4 User@Domain Principal Structure
+   -- As defined in RFC 8881 Section 5.9
+   NFSv4Principal ::= SEQUENCE {
+       user       UTF8String,
+       atSign     IA5String (SIZE (1)) (FROM ("@")),
+       domain     UTF8String  -- Supports internationalized domain names
+   }
+
+   -- For use in SubjectAltName otherName
+   nfsv4Principal OTHER-NAME ::= {
+       NFSv4Principal IDENTIFIED BY id-on-nfsv4Principal
+   }
+
+   END
 
 Acknowledgments
 

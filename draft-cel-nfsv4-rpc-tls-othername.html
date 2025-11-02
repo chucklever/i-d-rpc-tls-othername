@@ -13,7 +13,7 @@ that a client's x.509 certificate may carry instructions to the RPC
 server to execute all RPC transactions from that client as a single
 user identity. 
     " name="description">
-<meta content="xml2rfc 3.30.0" name="generator">
+<meta content="xml2rfc 3.31.0" name="generator">
 <meta content="x.509" name="keyword">
 <meta content="SubjectAltName" name="keyword">
 <meta content="otherName" name="keyword">
@@ -21,19 +21,18 @@ user identity.
 <meta content="SunRPC" name="keyword">
 <meta content="draft-cel-nfsv4-rpc-tls-othername-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.0
-    Python 3.12.11
+  xml2rfc 3.31.0
+    Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.3.8
+    platformdirs 4.5.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.4
-    setuptools 80.9.0
-    wcwidth 0.2.13
+    requests 2.32.5
+    wcwidth 0.2.14
 -->
 <link href="draft-cel-nfsv4-rpc-tls-othername.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1052,11 +1051,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SunRPC x.509 Identity Squashing</td>
-<td class="right">July 2025</td>
+<td class="right">November 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Macklem &amp; Lever</td>
-<td class="center">Expires 1 February 2026</td>
+<td class="center">Expires 6 May 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-othername-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-07-31" class="published">31 July 2025</time>
+<time datetime="2025-11-02" class="published">2 November 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-02-01">1 February 2026</time></dd>
+<dd class="expires"><time datetime="2026-05-06">6 May 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1131,7 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1248,10 +1247,24 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-asn1-modules" class="internal xref">ASN.1 Modules</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-the-rpcauthsysuser" class="internal xref">The RpcAuthSysUser</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-the-rpcgssuser" class="internal xref">The RpcGssUser</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-the-rpcnfsv4user" class="internal xref">The RpcNfsv4User</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1378,8 +1391,10 @@ name itself is conveyed as value field in otherName.<a href="#section-3-2.1.1" c
       </ul>
 <p id="section-3-3">This document specifies new uses of the otherName field to carry an
 RPC user identity. The receiving system (an RPC server) then
-converts all RPC users (as carried in the RPC header credential and
-verifier fields) to the user identity specified in the certificate.<a href="#section-3-3" class="pilcrow">¶</a></p>
+replaces the RPC user, as carried in the RPC header credential and
+verifier fields in each RPC request within the TLS session, with the
+user identity specified in the certificate used to authenticate that
+session.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="authsys-identities">
 <section id="section-3.1">
         <h3 id="name-auth_sys-identities">
@@ -1432,6 +1447,27 @@ verifier fields) to the user identity specified in the certificate.<a href="#sec
           </h4>
 <p id="section-3.2.2-1">The otherName value contains a principal name as described in
 <span><a href="https://rfc-editor.org/rfc/rfc2743#section-4" class="relref">Section 4</a> of [<a href="#RFC2743" class="cite xref">RFC2743</a>]</span>.<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-2">What you'll need to define in your RFC:<a href="#section-3.2.2-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2.2-3">
+<li id="section-3.2.2-3.1">
+              <p id="section-3.2.2-3.1.1">Scope &amp; Use Cases: When/why to use GSS principals in certificates<a href="#section-3.2.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.2.2-3.2">
+              <p id="section-3.2.2-3.2.1">Security Considerations: Trust relationships, name canonicalization<a href="#section-3.2.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.2.2-3.3">
+              <p id="section-3.2.2-3.3.1">Mechanism Requirements: What each GSS mechanism must specify for nameValue encoding<a href="#section-3.2.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.2.2-3.4">
+              <p id="section-3.2.2-3.4.1">Name Matching: How to compare two GSSExportedName values<a href="#section-3.2.2-3.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.2.2-3.5">
+              <p id="section-3.2.2-3.5.1">IANA Considerations: OID assignment request<a href="#section-3.2.2-3.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-3.2.2-3.6">
+              <p id="section-3.2.2-3.6.1">Examples: Kerberos principals, SPKM, etc.<a href="#section-3.2.2-3.6.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
 </section>
 </div>
 </section>
@@ -1554,7 +1590,7 @@ using an OID from the FreeBSD arc.<a href="#section-5.1-1.8.1" class="pilcrow">�
     </h2>
 </section>
 </div>
-<div id="iana-considerations">
+<div id="sec-iana-considerations">
 <section id="section-7">
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
@@ -1612,6 +1648,10 @@ using an OID from the FreeBSD arc.<a href="#section-5.1-1.8.1" class="pilcrow">�
         <dd>
 <span class="refAuthor">Thurlow, R.</span>, <span class="refTitle">"RPC: Remote Procedure Call Protocol Specification Version 2"</span>, <span class="seriesInfo">RFC 5531</span>, <span class="seriesInfo">DOI 10.17487/RFC5531</span>, <time datetime="2009-05" class="refDate">May 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5531">https://www.rfc-editor.org/rfc/rfc5531</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC5912">[RFC5912]</dt>
+        <dd>
+<span class="refAuthor">Hoffman, P.</span> and <span class="refAuthor">J. Schaad</span>, <span class="refTitle">"New ASN.1 Modules for the Public Key Infrastructure Using X.509 (PKIX)"</span>, <span class="seriesInfo">RFC 5912</span>, <span class="seriesInfo">DOI 10.17487/RFC5912</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5912">https://www.rfc-editor.org/rfc/rfc5912</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8881">[RFC8881]</dt>
         <dd>
 <span class="refAuthor">Noveck, D., Ed.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Network File System (NFS) Version 4 Minor Version 1 Protocol"</span>, <span class="seriesInfo">RFC 8881</span>, <span class="seriesInfo">DOI 10.17487/RFC8881</span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8881">https://www.rfc-editor.org/rfc/rfc8881</a>&gt;</span>. </dd>
@@ -1626,18 +1666,177 @@ using an OID from the FreeBSD arc.<a href="#section-5.1-1.8.1" class="pilcrow">�
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="asn1-modules">
 <section id="appendix-A">
+      <h2 id="name-asn1-modules">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-asn1-modules" class="section-name selfRef">ASN.1 Modules</a>
+      </h2>
+<p id="appendix-A-1">The following ASN.1 modules normatively specify the structure of
+the new otherName values described in this document.
+This specification uses the ASN.1 definitions from
+<span>[<a href="#RFC5912" class="cite xref">RFC5912</a>]</span> with the 2002 ASN.1 notation used in that document.
+<span>[<a href="#RFC5912" class="cite xref">RFC5912</a>]</span> updates normative documents using older ASN.1 notation.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div id="the-rpcauthsysuser">
+<section id="appendix-A.1">
+        <h3 id="name-the-rpcauthsysuser">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-the-rpcauthsysuser" class="section-name selfRef">The RpcAuthSysUser</a>
+        </h3>
+<div class="lang-ASN.1 sourcecode" id="appendix-A.1-1">
+<pre>
+RPCAuthSysCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-rpc-auth-sys(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for RPC AUTH_SYS credentials in otherName
+id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- RPC AUTH_SYS Credentials Structure
+-- UID and GID list as used in RPC AUTH_SYS authentication flavor
+RPCAuthSys ::= SEQUENCE {
+    uid        INTEGER (0..4294967295),  -- 32-bit UID
+    gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs
+}
+
+-- For use in SubjectAltName otherName
+rpcAuthSys OTHER-NAME ::= {
+    RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
+}
+
+END
+</pre><a href="#appendix-A.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="the-rpcgssuser">
+<section id="appendix-A.2">
+        <h3 id="name-the-rpcgssuser">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-the-rpcgssuser" class="section-name selfRef">The RpcGssUser</a>
+        </h3>
+<div class="lang-ASN.1 sourcecode" id="appendix-A.2-1">
+<pre>
+GSSAPIPrincipalCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-gss-exported-name(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for GSS-API Exported Name in otherName
+id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- GSS-API Exported Name Structure
+GSSExportedName ::= SEQUENCE {
+    nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
+    nameValue  OCTET STRING        -- Mechanism-specific exported name
+}
+
+-- For use in SubjectAltName otherName
+gssExportedName OTHER-NAME ::= {
+    GSSExportedName IDENTIFIED BY id-on-gssExportedName
+}
+
+END
+</pre><a href="#appendix-A.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="the-rpcnfsv4user">
+<section id="appendix-A.3">
+        <h3 id="name-the-rpcnfsv4user">
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-the-rpcnfsv4user" class="section-name selfRef">The RpcNfsv4User</a>
+        </h3>
+<div class="lang-ASN.1 sourcecode" id="appendix-A.3-1">
+<pre>
+NFSv4PrincipalCertExtn
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) id-mod(0)
+      id-mod-nfsv4-principal(TBD) }
+
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+    OTHER-NAME
+    FROM PKIX1Implicit-2009
+        { iso(1) identified-organization(3) dod(6) internet(1)
+          security(5) mechanisms(5) pkix(7) id-mod(0)
+          id-mod-pkix1-implicit-02(59) } ;
+
+-- Object Identifier Arc
+id-pkix OBJECT IDENTIFIER ::=
+    { iso(1) identified-organization(3) dod(6) internet(1)
+      security(5) mechanisms(5) pkix(7) }
+
+id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- OID for NFSv4 user@domain principal in otherName
+id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
+
+-- NFSv4 User@Domain Principal Structure
+-- As defined in RFC 8881 Section 5.9
+NFSv4Principal ::= SEQUENCE {
+    user       UTF8String,
+    atSign     IA5String (SIZE (1)) (FROM ("@")),
+    domain     UTF8String  -- Supports internationalized domain names
+}
+
+-- For use in SubjectAltName otherName
+nfsv4Principal OTHER-NAME ::= {
+    NFSv4Principal IDENTIFIED BY id-on-nfsv4Principal
+}
+
+END
+</pre><a href="#appendix-A.3-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">The authors are grateful to
+<p id="appendix-B-1">The authors are grateful to
 Jeff Layton,
 Greg Marsden,
 and
 Martin Thomson
-for their input and support.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">Special thanks to
+for their input and support.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">Special thanks to
 Area Director
 Gorry Fairhurst,
 NFSV4 Working Group Chairs
@@ -1647,11 +1846,11 @@ Christopher Inacio,
 and
 NFSV4 Working Group Secretary
 Thomas Haynes
-for their guidance and oversight.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+for their guidance and oversight.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
