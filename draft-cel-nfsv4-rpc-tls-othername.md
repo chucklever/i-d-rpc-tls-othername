@@ -253,7 +253,119 @@ Licensing:
 Implementation experience:
 : None to report
 
-# Security Considerations
+# Security Considerations {#sec-security-considerations}
+
+## General Security Considerations
+
+The security considerations for RPC-with-TLS described in {{Section 8 of RFC9289}}
+apply to this specification. In particular, the discussion about certificate
+validation, trust anchors, and the establishment of secure TLS sessions remains
+relevant.
+
+## Identity Squashing and Authorization
+
+This specification enables a client to request that all RPC operations within a
+TLS session be executed under a single user identity specified in the client's
+X.509 certificate. This "identity squashing" mechanism has several security
+implications:
+
+### Trust in the Certificate Authority
+
+The server MUST carefully consider which Certificate Authorities (CAs) it trusts
+to issue certificates containing the otherName extensions defined in this document.
+A compromised or malicious CA could issue certificates that allow unauthorized
+access to server resources under arbitrary user identities.
+
+Servers SHOULD maintain separate trust anchors for certificates containing
+identity squashing otherName fields versus certificates used solely for TLS
+peer authentication. This allows administrators to tightly control which CAs
+are authorized to assert user identities.
+
+### Authorization Decisions
+
+The presence of an otherName field specifying a user identity does not by itself
+grant any authorization. Servers MUST perform their normal authorization checks
+to determine whether the requested identity is permitted for the authenticated
+TLS peer.
+
+For example, a server might maintain an access control list mapping certificate
+subjects or distinguished names to the set of user identities they are permitted
+to assume. Only if such authorization succeeds should the server execute RPC
+operations under the specified identity.
+
+### Name Canonicalization
+
+#### NFSv4 Principals
+
+When processing NFSv4Principal otherName values, servers MUST apply the same
+name canonicalization and domain validation procedures described in
+{{Section 5.9 of RFC8881}}. In particular:
+
+- Domain names SHOULD be validated against expected domain suffixes
+- Internationalized domain names MUST be properly normalized
+- Case-sensitivity rules for usernames and domains MUST be consistently applied
+
+#### GSS-API Exported Names
+
+When processing GSSExportedName otherName values, servers MUST verify that:
+
+- The mechanism OID in the nameType field corresponds to a GSS-API mechanism
+  the server supports and trusts
+- The nameValue field conforms to the exported name format defined by that
+  specific GSS-API mechanism
+- The mechanism-specific name validation and canonicalization procedures are
+  followed
+
+Servers SHOULD NOT accept exported names from GSS-API mechanisms they do not
+fully support, as improper name handling could lead to authorization bypass
+vulnerabilities.
+
+#### AUTH_SYS Credentials
+
+When processing RPCAuthSys otherName values, servers MUST:
+
+- Validate that the UID and GIDs fall within acceptable ranges for the local
+  system's user database
+- Verify that the UID corresponds to a valid user account
+- Confirm that the GIDs represent valid groups and that the user is authorized
+  to be a member of those groups
+
+Servers SHOULD reject certificates containing UID 0 (root) or other privileged
+UIDs unless there is an explicit and well-justified operational requirement,
+and additional strong authorization controls are in place.
+
+## Session Binding
+
+All RPC operations within a TLS session containing an identity squashing otherName
+execute under the same user identity. Servers MUST ensure that session state
+cannot be hijacked or transferred between different TLS sessions, as this could
+allow an attacker to gain the privileges associated with the squashed identity.
+
+## Revocation
+
+Servers SHOULD support certificate revocation checking (via CRL, OCSP, or similar
+mechanisms) for certificates containing identity squashing otherName fields.
+Since these certificates grant user-level access to server resources, timely
+revocation is critical when a certificate is compromised or a user's access
+should be terminated.
+
+## Privacy Considerations
+
+The otherName fields defined in this specification reveal user identity information
+in the client's X.509 certificate. This information is transmitted during the TLS
+handshake and may be visible to network observers if the handshake is not properly
+protected.
+
+While TLS 1.3 encrypts most of the handshake including certificates, earlier TLS
+versions may expose this information. Deployments concerned about privacy SHOULD
+use TLS 1.3 or later.
+
+## Multiple Identity Formats
+
+Implementations MUST NOT allow multiple identity squashing otherName fields to be
+present simultaneously in the same SubjectAltName extension. If multiple such
+fields are present (e.g., both RPCAuthSys and NFSv4Principal), the server MUST
+reject the certificate to avoid ambiguity about which identity should be used.
 
 # IANA Considerations {#sec-iana-considerations}
 
