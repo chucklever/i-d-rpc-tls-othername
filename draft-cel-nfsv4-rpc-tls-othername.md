@@ -257,8 +257,36 @@ Implementation experience:
 
 # IANA Considerations {#sec-iana-considerations}
 
-{:aside}
-> Insert request for allocations of a SubjectAltName : otherName object identifiers
+## SMI Security for PKIX Module Identifier
+
+IANA is requested to assign three object identifiers for the ASN.1 modules
+specified in this document in the "SMI Security for PKIX Module Identifier"
+registry (1.3.6.1.5.5.7.0):
+
+| Decimal | Description                      | References  |
+|:--------|:---------------------------------|:------------|
+| TBD1    | id-mod-rpc-auth-sys              | RFC-TBD     |
+| TBD2    | id-mod-gss-exported-name         | RFC-TBD     |
+| TBD3    | id-mod-nfsv4-principal           | RFC-TBD     |
+
+## SMI Security for PKIX Other Name Forms
+
+IANA is requested to assign three object identifiers for the otherName
+types specified in this document in the "SMI Security for PKIX Other
+Name Forms" registry (1.3.6.1.5.5.7.8):
+
+| Decimal | Description                      | References  |
+|:--------|:---------------------------------|:------------|
+| TBD4    | id-on-rpcAuthSys                 | RFC-TBD     |
+| TBD5    | id-on-gssExportedName            | RFC-TBD     |
+| TBD6    | id-on-nfsv4Principal             | RFC-TBD     |
+
+These otherName identifiers are used in the SubjectAltName extension
+of X.509 certificates to carry RPC user identity information for the
+purpose of identity squashing as described in this document.
+
+"RFC-TBD" is to be replaced with the actual RFC number when this
+document is published.
 
 --- back
 
@@ -300,6 +328,7 @@ id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
 
 -- RPC AUTH_SYS Credentials Structure
 -- UID and GID list as used in RPC AUTH_SYS authentication flavor
+-- See RFC 5531 (ONC RPC) and related specifications
 RPCAuthSys ::= SEQUENCE {
     uid        INTEGER (0..4294967295),  -- 32-bit UID
     gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs
@@ -342,6 +371,7 @@ id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
 id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
 
 -- GSS-API Exported Name Structure
+-- As defined in RFC 2743 Section 3.2
 GSSExportedName ::= SEQUENCE {
     nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
     nameValue  OCTET STRING        -- Mechanism-specific exported name
