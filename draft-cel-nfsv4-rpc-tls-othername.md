@@ -233,52 +233,44 @@ that do not support this specification, though without identity squashing.
 
 ### otherName OID for AUTH_SYS
 
-{:aside}
-> State the Object Identifier to be used to indicate this form
-  of RPC user identity
+The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
+defined in {{sec-authsys-asn1}}.
 
 ### Format of the otherName Value
 
-{:aside}
-> This will be a set of 32-bit integers that specify a numeric UID,
-  and a counted list of 32-bit integers that specify numeric GIDs.
+The otherName value for AUTH_SYS identities contains an RPCAuthSys
+structure as defined in {{sec-authsys-asn1}}. This structure consists
+of a 32-bit unsigned integer specifying a numeric UID, and a sequence
+of 32-bit unsigned integers specifying numeric GIDs.
 
-## Kerberos V5 Principals
+The use of these integers is further explained in {{?RFC5531}}.
 
-### otherName OID for AUTH_SYS
+## GSS-API Principals
 
-{:aside}
-> State the Object Identifier to be used to indicate this form
-  of RPC user identity
+### otherName OID for GSS-API Principals
+
+The otherName OID for GSS-API exported names is id-on-gssExportedName,
+defined in {{sec-gss-asn1}}.
 
 ### Format of the otherName Value
 
-The otherName value contains a principal name as described in
-{{Section 4 of !RFC2743}}.
-
-What you'll need to define in your RFC:
-
-1. Scope & Use Cases: When/why to use GSS principals in certificates
-2. Security Considerations: Trust relationships, name canonicalization
-3. Mechanism Requirements: What each GSS mechanism must specify for nameValue encoding
-4. Name Matching: How to compare two GSSExportedName values
-5. IANA Considerations: OID assignment request
-6. Examples: Kerberos principals, SPKM, etc.
+The otherName value contains a GSSExportedName structure as defined in
+{{sec-gss-asn1}}, consisting of a GSS-API mechanism OID and a
+mechanism-specific exported name value as described in {{Section 3.2 of ?RFC2743}}.
 
 ## NFSv4 User @ Domain String Identities
 
 ### otherName OID for String Identities
 
-{:aside}
-> State the Object Identifier to be used to indicate this form
-  of RPC user identity
+The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
+defined in {{sec-nfsv4-asn1}}.
 
 ### Format of the otherName Value
 
-{:aside}
-> Follow recommendations of draft-ietf-nfsv4-internationalization-latest
-  to form an internationalized "user@domain" string similar to NFSv4 ID
-  map strings.
+The otherName value contains an NFSv4Principal structure as defined in
+{{sec-nfsv4-asn1}}, consisting of a UTF-8 encoded user name, the
+literal "@" character, and a UTF-8 encoded domain name, as described in
+{{Section 5.9 of ?RFC8881}}.
 
 # Extending This Mechanism
 
@@ -287,10 +279,13 @@ of RPC user identity, such as Windows Security Identifiers.
 This section describes how standards action can extend the mechanism
 specified in this document to accommodate new forms of user identity.
 
-{:aside}
-> Provide the base level of general requirements that we will have to
-  meet in this document as instructions to future authors. I'm not
-  sure yet exactly what those are.
+Here, we'll provide the base level of general requirements that must be
+met, as instructions to future authors. These are to include:
+
+- New identity types must define an ASN.1 module
+- Must request IANA OID allocation
+- Should provide security considerations specific to that identity type
+- Should provide examples and test vectors
 
 # Client Certificate Generation
 
@@ -358,7 +353,7 @@ information propagates in the environment.
 # Implementation Status
 
 {:aside}
-> This section is to be removed before publishing this document as an RFC.
+> RFC Editor: This section is to be removed before publishing this document as an RFC.
 
 This section records the status of known implementations of the
 protocol defined by this specification at the time of posting of this
@@ -553,7 +548,7 @@ This specification uses the ASN.1 definitions from
 {{?RFC5912}} with the 2002 ASN.1 notation used in that document.
 {{RFC5912}} updates normative documents using older ASN.1 notation.
 
-## The RpcAuthSysUser
+## The RpcAuthSysUser {#sec-authsys-asn1}
 
 ~~~ asn.1
 RPCAuthSysCertExtn
@@ -597,7 +592,7 @@ rpcAuthSys OTHER-NAME ::= {
 END
 ~~~
 
-## The RpcGssUser
+## The RpcGssUser {#sec-gss-asn1}
 
 ~~~ asn.1
 GSSAPIPrincipalCertExtn
@@ -640,7 +635,7 @@ gssExportedName OTHER-NAME ::= {
 END
 ~~~
 
-## The RpcNfsv4User
+## The RpcNfsv4User {#sec-nfsv4-asn1}
 
 ~~~ asn.1
 NFSv4PrincipalCertExtn
