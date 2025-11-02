@@ -35,14 +35,6 @@ author:
     country: United States of America
     email: chuck.lever@oracle.com
 
-informative:
-  SSID:
-    target: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
-    title: Security Identifiers
-    author:
-      org: Microsoft
-    ann: Replace this with a reference to an MS standards doc
-
 venue:
   group: nfsv4
   type: Working Group
@@ -291,7 +283,7 @@ What you'll need to define in your RFC:
 # Extending This Mechanism
 
 It is possible that in the future, RPC servers might implement other forms
-of RPC user identity, such as Windows Security Identifiers (SSIDs) {{SSID}}.
+of RPC user identity, such as Windows Security Identifiers.
 This section describes how standards action can extend the mechanism
 specified in this document to accommodate new forms of user identity.
 
