@@ -412,7 +412,7 @@ This specification uses the ASN.1 definitions from
 
 ## The RpcAuthSysUser
 
-~~~ ASN.1
+~~~ asn.1
 RPCAuthSysCertExtn
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -456,7 +456,7 @@ END
 
 ## The RpcGssUser
 
-~~~ ASN.1
+~~~ asn.1
 GSSAPIPrincipalCertExtn
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -499,7 +499,7 @@ END
 
 ## The RpcNfsv4User
 
-~~~ ASN.1
+~~~ asn.1
 NFSv4PrincipalCertExtn
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -540,6 +540,162 @@ nfsv4Principal OTHER-NAME ::= {
 
 END
 ~~~
+
+# Certificate Examples {#sec-certificate-examples}
+
+This appendix provides examples of X.509 certificates containing the
+otherName extensions defined in this document. These examples are
+provided in both human-readable notation and hexadecimal DER encoding
+to assist implementers in verifying their implementations.
+
+## NFSv4 Principal Example
+
+This example shows a certificate for user "alice" at domain "nfs.example.com":
+
+~~~ asn.1
+SubjectAltName ::= SEQUENCE {
+    otherName [0] IMPLICIT SEQUENCE {
+        type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
+        value [0] EXPLICIT NFSv4Principal ::= {
+            user "alice",
+            atSign "@",
+            domain "nfs.example.com"
+        }
+    }
+}
+~~~
+
+DER encoding (hexadecimal):
+
+~~~
+30 2B A0 29 06 08 2B 06 01 05 05 07 08 XX A0 1D
+0C 05 61 6C 69 63 65 13 01 40 0C 0F 6E 66 73 2E
+65 78 61 6D 70 6C 65 2E 63 6F 6D
+~~~
+
+Note: XX represents the TBD value for id-on-nfsv4Principal.
+
+## GSS-API Exported Name Example
+
+This example shows a certificate containing a Kerberos V5 principal
+for "bob@EXAMPLE.COM":
+
+~~~ asn.1
+SubjectAltName ::= SEQUENCE {
+    otherName [0] IMPLICIT SEQUENCE {
+        type-id OBJECT IDENTIFIER ::= id-on-gssExportedName,
+        value [0] EXPLICIT GSSExportedName ::= {
+            nameType 1.2.840.113554.1.2.2,  -- Kerberos V5
+            nameValue '04 01 00 0B 06 09 2A 86 48 86 F7 12 01 02 02
+                       00 00 00 11 62 6F 62 40 45 58 41 4D 50 4C 45
+                       2E 43 4F 4D'H
+        }
+    }
+}
+~~~
+
+DER encoding (hexadecimal):
+
+~~~
+30 47 A0 45 06 08 2B 06 01 05 05 07 08 YY A0 39
+30 37 06 09 2A 86 48 86 F7 12 01 02 02 04 2A 04
+01 00 0B 06 09 2A 86 48 86 F7 12 01 02 02 00 00
+00 11 62 6F 62 40 45 58 41 4D 50 4C 45 2E 43 4F
+4D
+~~~
+
+Note: YY represents the TBD value for id-on-gssExportedName.
+
+The nameValue field contains the GSS-API exported name token format
+as defined by the Kerberos V5 mechanism. The first four bytes
+(04 01 00 0B) are the token ID and length fields defined in
+{{Section 3.2 of RFC2743}}.
+
+## RPC AUTH_SYS Example
+
+This example shows a certificate containing UID 1000 and GIDs
+1000, 10, and 100:
+
+~~~ asn.1
+SubjectAltName ::= SEQUENCE {
+    otherName [0] IMPLICIT SEQUENCE {
+        type-id OBJECT IDENTIFIER ::= id-on-rpcAuthSys,
+        value [0] EXPLICIT RPCAuthSys ::= {
+            uid 1000,
+            gids { 1000, 10, 100 }
+        }
+    }
+}
+~~~
+
+DER encoding (hexadecimal):
+
+~~~
+30 20 A0 1E 06 08 2B 06 01 05 05 07 08 ZZ A0 12
+30 10 02 02 03 E8 30 0A 02 02 03 E8 02 01 0A 02
+01 64
+~~~
+
+Note: ZZ represents the TBD value for id-on-rpcAuthSys.
+
+Breaking down the encoding:
+- 02 02 03 E8: INTEGER 1000 (UID)
+- 30 0A: SEQUENCE OF (GIDs)
+  - 02 02 03 E8: INTEGER 1000
+  - 02 01 0A: INTEGER 10
+  - 02 01 64: INTEGER 100
+
+## Complete Certificate Example
+
+This example shows a minimal self-signed certificate containing an
+NFSv4Principal otherName. Line breaks and whitespace have been added
+for readability:
+
+~~~
+-----BEGIN CERTIFICATE-----
+MIICXzCCAcigAwIBAgIUAbCdEfG7KH0FjLbI8N9cJQqQoLwwDQYJKoZIhvcNAQEL
+BQAwRDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExDzANBgNVBAcM
+BklydmluZTEPMA0GA1UECgwGT3JhY2xlMB4XDTI1MDEwMTAwMDAwMFoXDTI2MDEw
+MTAwMDAwMFowRDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExDzAN
+BgNVBAcMBklydmluZTEPMA0GA1UECgwGT3JhY2xlMIGfMA0GCSqGSIb3DQEBAQUA
+A4GNADCBiQKBgQC7VJTUt9Us8cKjMzEfYyjiWA4R4ypbHqGC0H0+tG3hGbN3MYHa
+... [additional base64-encoded certificate data] ...
+oxUwEwYDVR0lBAwwCgYIKwYBBQUHAwEwKwYDVR0RBCQwIqAfBggrBgEFBQcIAKAT
+DBVhbGljZUBuZnMuZXhhbXBsZS5jb20wDQYJKoZIhvcNAQELBQADgYEAk3+...
+-----END CERTIFICATE-----
+~~~
+
+The SubjectAltName extension in this certificate is encoded at the
+position indicated by the bytes following the Extended Key Usage
+extension.
+
+## Internationalized Domain Name Example
+
+This example shows an NFSv4Principal with internationalized characters:
+
+~~~ asn.1
+SubjectAltName ::= SEQUENCE {
+    otherName [0] IMPLICIT SEQUENCE {
+        type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
+        value [0] EXPLICIT NFSv4Principal ::= {
+            user "用户",        -- Chinese characters for "user"
+            atSign "@",
+            domain "例え.jp"    -- Japanese IDN
+        }
+    }
+}
+~~~
+
+DER encoding (hexadecimal):
+
+~~~
+30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
+0C 06 E7 94 A8 E6 88 B7 13 01 40 0C 0C E4 BE 8B
+E3 81 88 2E 6A 70
+~~~
+
+Note: The UTF-8 encoding of the Chinese characters "用户" is
+E7 94 A8 E6 88 B7, and the Japanese text "例え" is E4 BE 8B E3 81 88.
 
 # Acknowledgments
 {:numbered="false"}
