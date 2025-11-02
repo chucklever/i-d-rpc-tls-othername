@@ -300,6 +300,69 @@ specified in this document to accommodate new forms of user identity.
   meet in this document as instructions to future authors. I'm not
   sure yet exactly what those are.
 
+# Client Certificate Generation
+
+This section provides non-normative guidance for Certificate Authorities
+and administrators who generate client certificates containing identity
+squashing otherName fields.
+
+## Choosing an Identity Format
+
+The choice of which identity format to use depends on the deployment
+environment:
+
+RPCAuthSys
+: Appropriate for environments where numeric UIDs and GIDs are the primary
+  form of user identity, such as traditional UNIX/Linux systems. This format
+  is compact but requires that UID/GID mappings be consistent between the
+  certificate and the server's user database.
+
+GSSExportedName
+: Suitable for environments using GSS-API mechanisms like Kerberos. This
+  format provides the strongest integration with existing enterprise
+  authentication infrastructure but requires that servers support the
+  specific GSS-API mechanism indicated by the nameType OID.
+
+NFSv4Principal
+: Recommended for heterogeneous environments or when human-readable
+  identities are preferred. The user@domain format is familiar to
+  administrators and supports internationalization, but requires that
+  servers perform name-to-UID mapping similar to NFSv4 identity mapping.
+
+## Populating Identity Fields
+
+When generating certificates, consider these guidelines:
+
+UID/GID values
+: Ensure that the numeric values in RPCAuthSys correspond to valid entries
+  in the server's user database. Avoid using privileged UIDs (such as 0 for
+  root) unless there is a specific operational requirement and strong
+  authorization controls are in place.
+
+GSS-API exported names
+: The nameValue field should contain a properly formatted exported name
+  token as defined by the specific GSS-API mechanism. For Kerberos, this
+  follows the format specified in {{?RFC4121}}. Consult the mechanism
+  specification for proper encoding.
+
+User@domain strings
+: Both the user and domain components should be UTF-8 encoded. Domain names
+  should typically match the DNS domain under which the server operates.
+  International domain names should be encoded in UTF-8, not in Punycode
+  (ACE) form.
+
+## Certificate Validity Period
+
+Certificates containing identity squashing otherName fields grant access
+to server resources under a specific user identity. Administrators should
+consider appropriate validity periods based on their security requirements.
+Shorter validity periods reduce the window of exposure if a certificate is
+compromised, but may increase operational overhead for certificate renewal.
+
+The choice of validity period might also consider whether certificate
+revocation checking (CRL or OCSP) is deployed and how quickly revocation
+information propagates in the environment.
+
 # Implementation Status
 
 {:aside}
