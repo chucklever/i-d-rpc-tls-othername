@@ -1055,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Macklem &amp; Lever</td>
-<td class="center">Expires 6 May 2026</td>
+<td class="center">Expires 25 May 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-othername-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-11-02" class="published">2 November 2025</time>
+<time datetime="2025-11-21" class="published">21 November 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-05-06">6 May 2026</time></dd>
+<dd class="expires"><time datetime="2026-05-25">25 May 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1131,7 +1131,7 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 25 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1306,16 +1306,10 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-asn1-modules" class="internal xref">ASN.1 Modules</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-asn1-module" class="internal xref">ASN.1 Module</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-the-rpcauthsysuser" class="internal xref">The RpcAuthSysUser</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
-                <p id="section-toc.1-1.10.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-the-rpcgssuser" class="internal xref">The RpcGssUser</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
-                <p id="section-toc.1-1.10.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-the-rpcnfsv4user" class="internal xref">The RpcNfsv4User</a></p>
+                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-rpc-tls-identity-squashing-" class="internal xref">RPC TLS Identity Squashing Module</a></p>
 </li>
             </ul>
 </li>
@@ -1604,7 +1598,7 @@ that do not support this specification, though without identity squashing.<a hre
 <a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-othername-oid-for-auth_sys" class="section-name selfRef">otherName OID for AUTH_SYS</a>
           </h4>
 <p id="section-3.4.1-1">The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
-defined in <a href="#sec-authsys-asn1" class="auto internal xref">Appendix A.1</a>.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value">
@@ -1613,7 +1607,7 @@ defined in <a href="#sec-authsys-asn1" class="auto internal xref">Appendix A.1</
 <a href="#section-3.4.2" class="section-number selfRef">3.4.2. </a><a href="#name-format-of-the-othername-val" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
 <p id="section-3.4.2-1">The otherName value for AUTH_SYS identities contains an RPCAuthSys
-structure as defined in <a href="#sec-authsys-asn1" class="auto internal xref">Appendix A.1</a>. This structure consists
+structure as defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>. This structure consists
 of a 32-bit unsigned integer specifying a numeric UID, and a sequence
 of 32-bit unsigned integers specifying numeric GIDs.<a href="#section-3.4.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.4.2-2">The use of these integers is further explained in <span>[<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>.<a href="#section-3.4.2-2" class="pilcrow">¶</a></p>
@@ -1632,7 +1626,7 @@ of 32-bit unsigned integers specifying numeric GIDs.<a href="#section-3.4.2-1" c
 <a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-othername-oid-for-gss-api-p" class="section-name selfRef">otherName OID for GSS-API Principals</a>
           </h4>
 <p id="section-3.5.1-1">The otherName OID for GSS-API exported names is id-on-gssExportedName,
-defined in <a href="#sec-gss-asn1" class="auto internal xref">Appendix A.2</a>.<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value-1">
@@ -1641,7 +1635,7 @@ defined in <a href="#sec-gss-asn1" class="auto internal xref">Appendix A.2</a>.<
 <a href="#section-3.5.2" class="section-number selfRef">3.5.2. </a><a href="#name-format-of-the-othername-valu" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
 <p id="section-3.5.2-1">The otherName value contains a GSSExportedName structure as defined in
-<a href="#sec-gss-asn1" class="auto internal xref">Appendix A.2</a>, consisting of a GSS-API mechanism OID and a
+<a href="#sec-asn1" class="auto internal xref">Appendix A</a>, consisting of a GSS-API mechanism OID and a
 mechanism-specific exported name value as described in <span><a href="https://rfc-editor.org/rfc/rfc2743#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC2743" class="cite xref">RFC2743</a>]</span>.<a href="#section-3.5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1658,7 +1652,9 @@ mechanism-specific exported name value as described in <span><a href="https://rf
 <a href="#section-3.6.1" class="section-number selfRef">3.6.1. </a><a href="#name-othername-oid-for-string-id" class="section-name selfRef">otherName OID for String Identities</a>
           </h4>
 <p id="section-3.6.1-1">The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
-defined in <a href="#sec-nfsv4-asn1" class="auto internal xref">Appendix A.3</a>.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>. This principal appears in the same form as an
+internatialized electronic mail addresses, following the normative rules
+specified by <span><a href="https://rfc-editor.org/rfc/rfc5280#section-7.5" class="relref">Section 7.5</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and its updates.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value-2">
@@ -1667,7 +1663,7 @@ defined in <a href="#sec-nfsv4-asn1" class="auto internal xref">Appendix A.3</a>
 <a href="#section-3.6.2" class="section-number selfRef">3.6.2. </a><a href="#name-format-of-the-othername-value" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
 <p id="section-3.6.2-1">The otherName value contains an NFSv4Principal structure as defined in
-<a href="#sec-nfsv4-asn1" class="auto internal xref">Appendix A.3</a>, consisting of a UTF-8 encoded user name, the
+<a href="#sec-asn1" class="auto internal xref">Appendix A</a>, consisting of a UTF-8 encoded user name, the
 literal "@" character, and a UTF-8 encoded domain name, as described in
 <span><a href="https://rfc-editor.org/rfc/rfc8881#section-5.9" class="relref">Section 5.9</a> of [<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>.<a href="#section-3.6.2-1" class="pilcrow">¶</a></p>
 </section>
@@ -2054,7 +2050,7 @@ reject the certificate to avoid ambiguity about which identity should be used.<a
         <h3 id="name-smi-security-for-pkix-modul">
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-smi-security-for-pkix-modul" class="section-name selfRef">SMI Security for PKIX Module Identifier</a>
         </h3>
-<p id="section-8.1-1">IANA is requested to assign three object identifiers for the ASN.1 modules
+<p id="section-8.1-1">IANA is requested to assign an object identifier for the ASN.1 module
 specified in this document in the "SMI Security for PKIX Module Identifier"
 registry (1.3.6.1.5.5.7.0):<a href="#section-8.1-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
@@ -2069,17 +2065,7 @@ registry (1.3.6.1.5.5.7.0):<a href="#section-8.1-1" class="pilcrow">¶</a></p>
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">TBD1</td>
-              <td class="text-left" rowspan="1" colspan="1">id-mod-rpc-auth-sys</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
-            </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD2</td>
-              <td class="text-left" rowspan="1" colspan="1">id-mod-gss-exported-name</td>
-              <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
-            </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD3</td>
-              <td class="text-left" rowspan="1" colspan="1">id-mod-nfsv4-principal</td>
+              <td class="text-left" rowspan="1" colspan="1">id-mod-rpc-tls-identity-squashing</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
           </tbody>
@@ -2195,27 +2181,27 @@ document is published.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="asn1-modules">
+<div id="sec-asn1">
 <section id="appendix-A">
-      <h2 id="name-asn1-modules">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-asn1-modules" class="section-name selfRef">ASN.1 Modules</a>
+      <h2 id="name-asn1-module">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-asn1-module" class="section-name selfRef">ASN.1 Module</a>
       </h2>
-<p id="appendix-A-1">The following ASN.1 modules normatively specify the structure of
+<p id="appendix-A-1">The following ASN.1 module normatively specifies the structure of
 the new otherName values described in this document.
 This specification uses the ASN.1 definitions from
 <span>[<a href="#RFC5912" class="cite xref">RFC5912</a>]</span> with the 2002 ASN.1 notation used in that document.
 <span>[<a href="#RFC5912" class="cite xref">RFC5912</a>]</span> updates normative documents using older ASN.1 notation.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<div id="sec-authsys-asn1">
+<div id="rpc-tls-identity-squashing-module">
 <section id="appendix-A.1">
-        <h3 id="name-the-rpcauthsysuser">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-the-rpcauthsysuser" class="section-name selfRef">The RpcAuthSysUser</a>
+        <h3 id="name-rpc-tls-identity-squashing-">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-rpc-tls-identity-squashing-" class="section-name selfRef">RPC TLS Identity Squashing Module</a>
         </h3>
-<div class="lang-asn.1 sourcecode" id="appendix-A.1-1">
+<div class="breakable lang-asn.1 sourcecode" id="appendix-A.1-1">
 <pre>
-RPCAuthSysCertExtn
+RPCTLSIdentitySquashing
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-rpc-auth-sys(TBD) }
+      id-mod-rpc-tls-identity-squashing(TBD) }
 
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -2233,6 +2219,10 @@ id-pkix OBJECT IDENTIFIER ::=
       security(5) mechanisms(5) pkix(7) }
 
 id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- ===================================================================
+-- RPC AUTH_SYS Identity Squashing
+-- ===================================================================
 
 -- OID for RPC AUTH_SYS credentials in otherName
 id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2250,39 +2240,9 @@ rpcAuthSys OTHER-NAME ::= {
     RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
 }
 
-END
-</pre><a href="#appendix-A.1-1" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="sec-gss-asn1">
-<section id="appendix-A.2">
-        <h3 id="name-the-rpcgssuser">
-<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-the-rpcgssuser" class="section-name selfRef">The RpcGssUser</a>
-        </h3>
-<div class="lang-asn.1 sourcecode" id="appendix-A.2-1">
-<pre>
-GSSAPIPrincipalCertExtn
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-gss-exported-name(TBD) }
-
-DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
-
-IMPORTS
-    OTHER-NAME
-    FROM PKIX1Implicit-2009
-        { iso(1) identified-organization(3) dod(6) internet(1)
-          security(5) mechanisms(5) pkix(7) id-mod(0)
-          id-mod-pkix1-implicit-02(59) } ;
-
--- Object Identifier Arc
-id-pkix OBJECT IDENTIFIER ::=
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) }
-
-id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+-- ===================================================================
+-- GSS-API Exported Name Identity Squashing
+-- ===================================================================
 
 -- OID for GSS-API Exported Name in otherName
 id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2299,39 +2259,9 @@ gssExportedName OTHER-NAME ::= {
     GSSExportedName IDENTIFIED BY id-on-gssExportedName
 }
 
-END
-</pre><a href="#appendix-A.2-1" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="sec-nfsv4-asn1">
-<section id="appendix-A.3">
-        <h3 id="name-the-rpcnfsv4user">
-<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-the-rpcnfsv4user" class="section-name selfRef">The RpcNfsv4User</a>
-        </h3>
-<div class="lang-asn.1 sourcecode" id="appendix-A.3-1">
-<pre>
-NFSv4PrincipalCertExtn
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-nfsv4-principal(TBD) }
-
-DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
-
-IMPORTS
-    OTHER-NAME
-    FROM PKIX1Implicit-2009
-        { iso(1) identified-organization(3) dod(6) internet(1)
-          security(5) mechanisms(5) pkix(7) id-mod(0)
-          id-mod-pkix1-implicit-02(59) } ;
-
--- Object Identifier Arc
-id-pkix OBJECT IDENTIFIER ::=
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) }
-
-id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+-- ===================================================================
+-- NFSv4 User@Domain Principal Identity Squashing
+-- ===================================================================
 
 -- OID for NFSv4 user@domain principal in otherName
 id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2339,9 +2269,7 @@ id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
 -- NFSv4 User@Domain Principal Structure
 -- As defined in RFC 8881 Section 5.9
 NFSv4Principal ::= SEQUENCE {
-    user       UTF8String,
-    atSign     IA5String (SIZE (1)) (FROM ("@")),
-    domain     UTF8String  -- Supports internationalized domain names
+    principal  UTF8String          -- user@domain string
 }
 
 -- For use in SubjectAltName otherName
@@ -2350,7 +2278,7 @@ nfsv4Principal OTHER-NAME ::= {
 }
 
 END
-</pre><a href="#appendix-A.3-1" class="pilcrow">¶</a>
+</pre><a href="#appendix-A.1-1" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
