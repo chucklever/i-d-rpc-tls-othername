@@ -226,12 +226,12 @@ that do not support this specification, though without identity squashing.
 ### otherName OID for AUTH_SYS
 
 The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
-defined in {{sec-authsys-asn1}}.
+defined in {{sec-asn1}}.
 
 ### Format of the otherName Value
 
 The otherName value for AUTH_SYS identities contains an RPCAuthSys
-structure as defined in {{sec-authsys-asn1}}. This structure consists
+structure as defined in {{sec-asn1}}. This structure consists
 of a 32-bit unsigned integer specifying a numeric UID, and a sequence
 of 32-bit unsigned integers specifying numeric GIDs.
 
@@ -242,12 +242,12 @@ The use of these integers is further explained in {{?RFC5531}}.
 ### otherName OID for GSS-API Principals
 
 The otherName OID for GSS-API exported names is id-on-gssExportedName,
-defined in {{sec-gss-asn1}}.
+defined in {{sec-asn1}}.
 
 ### Format of the otherName Value
 
 The otherName value contains a GSSExportedName structure as defined in
-{{sec-gss-asn1}}, consisting of a GSS-API mechanism OID and a
+{{sec-asn1}}, consisting of a GSS-API mechanism OID and a
 mechanism-specific exported name value as described in {{Section 3.2 of ?RFC2743}}.
 
 ## NFSv4 User @ Domain String Identities
@@ -255,12 +255,12 @@ mechanism-specific exported name value as described in {{Section 3.2 of ?RFC2743
 ### otherName OID for String Identities
 
 The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
-defined in {{sec-nfsv4-asn1}}.
+defined in {{sec-asn1}}.
 
 ### Format of the otherName Value
 
 The otherName value contains an NFSv4Principal structure as defined in
-{{sec-nfsv4-asn1}}, consisting of a UTF-8 encoded user name, the
+{{sec-asn1}}, consisting of a UTF-8 encoded user name, the
 literal "@" character, and a UTF-8 encoded domain name, as described in
 {{Section 5.9 of ?RFC8881}}.
 
@@ -501,15 +501,13 @@ reject the certificate to avoid ambiguity about which identity should be used.
 
 ## SMI Security for PKIX Module Identifier
 
-IANA is requested to assign three object identifiers for the ASN.1 modules
+IANA is requested to assign an object identifier for the ASN.1 module
 specified in this document in the "SMI Security for PKIX Module Identifier"
 registry (1.3.6.1.5.5.7.0):
 
-| Decimal | Description                      | References  |
-|:--------|:---------------------------------|:------------|
-| TBD1    | id-mod-rpc-auth-sys              | RFC-TBD     |
-| TBD2    | id-mod-gss-exported-name         | RFC-TBD     |
-| TBD3    | id-mod-nfsv4-principal           | RFC-TBD     |
+| Decimal | Description                       | References  |
+|:--------|:----------------------------------|:------------|
+| TBD1    | id-mod-rpc-tls-identity-squashing | RFC-TBD     |
 
 ## SMI Security for PKIX Other Name Forms
 
@@ -517,11 +515,11 @@ IANA is requested to assign three object identifiers for the otherName
 types specified in this document in the "SMI Security for PKIX Other
 Name Forms" registry (1.3.6.1.5.5.7.8):
 
-| Decimal | Description                      | References  |
-|:--------|:---------------------------------|:------------|
-| TBD4    | id-on-rpcAuthSys                 | RFC-TBD     |
-| TBD5    | id-on-gssExportedName            | RFC-TBD     |
-| TBD6    | id-on-nfsv4Principal             | RFC-TBD     |
+| Decimal | Description                       | References  |
+|:--------|:----------------------------------|:------------|
+| TBD4    | id-on-rpcAuthSys                  | RFC-TBD     |
+| TBD5    | id-on-gssExportedName             | RFC-TBD     |
+| TBD6    | id-on-nfsv4Principal              | RFC-TBD     |
 
 These otherName identifiers are used in the SubjectAltName extension
 of X.509 certificates to carry RPC user identity information for the
@@ -532,21 +530,21 @@ document is published.
 
 --- back
 
-# ASN.1 Modules
+# ASN.1 Module {#sec-asn1}
 
-The following ASN.1 modules normatively specify the structure of
+The following ASN.1 module normatively specifies the structure of
 the new otherName values described in this document.
 This specification uses the ASN.1 definitions from
 {{?RFC5912}} with the 2002 ASN.1 notation used in that document.
 {{RFC5912}} updates normative documents using older ASN.1 notation.
 
-## The RpcAuthSysUser {#sec-authsys-asn1}
+## RPC TLS Identity Squashing Module
 
 ~~~ asn.1
-RPCAuthSysCertExtn
+RPCTLSIdentitySquashing
     { iso(1) identified-organization(3) dod(6) internet(1)
       security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-rpc-auth-sys(TBD) }
+      id-mod-rpc-tls-identity-squashing(TBD) }
 
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -564,6 +562,10 @@ id-pkix OBJECT IDENTIFIER ::=
       security(5) mechanisms(5) pkix(7) }
 
 id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+
+-- ===================================================================
+-- RPC AUTH_SYS Identity Squashing
+-- ===================================================================
 
 -- OID for RPC AUTH_SYS credentials in otherName
 id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
@@ -581,33 +583,9 @@ rpcAuthSys OTHER-NAME ::= {
     RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
 }
 
-END
-~~~
-
-## The RpcGssUser {#sec-gss-asn1}
-
-~~~ asn.1
-GSSAPIPrincipalCertExtn
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-gss-exported-name(TBD) }
-
-DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
-
-IMPORTS
-    OTHER-NAME
-    FROM PKIX1Implicit-2009
-        { iso(1) identified-organization(3) dod(6) internet(1)
-          security(5) mechanisms(5) pkix(7) id-mod(0)
-          id-mod-pkix1-implicit-02(59) } ;
-
--- Object Identifier Arc
-id-pkix OBJECT IDENTIFIER ::=
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) }
-
-id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+-- ===================================================================
+-- GSS-API Exported Name Identity Squashing
+-- ===================================================================
 
 -- OID for GSS-API Exported Name in otherName
 id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
@@ -624,33 +602,9 @@ gssExportedName OTHER-NAME ::= {
     GSSExportedName IDENTIFIED BY id-on-gssExportedName
 }
 
-END
-~~~
-
-## The RpcNfsv4User {#sec-nfsv4-asn1}
-
-~~~ asn.1
-NFSv4PrincipalCertExtn
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) id-mod(0)
-      id-mod-nfsv4-principal(TBD) }
-
-DEFINITIONS IMPLICIT TAGS ::=
-BEGIN
-
-IMPORTS
-    OTHER-NAME
-    FROM PKIX1Implicit-2009
-        { iso(1) identified-organization(3) dod(6) internet(1)
-          security(5) mechanisms(5) pkix(7) id-mod(0)
-          id-mod-pkix1-implicit-02(59) } ;
-
--- Object Identifier Arc
-id-pkix OBJECT IDENTIFIER ::=
-    { iso(1) identified-organization(3) dod(6) internet(1)
-      security(5) mechanisms(5) pkix(7) }
-
-id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
+-- ===================================================================
+-- NFSv4 User@Domain Principal Identity Squashing
+-- ===================================================================
 
 -- OID for NFSv4 user@domain principal in otherName
 id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
