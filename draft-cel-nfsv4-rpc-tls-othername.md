@@ -255,7 +255,9 @@ mechanism-specific exported name value as described in {{Section 3.2 of ?RFC2743
 ### otherName OID for String Identities
 
 The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
-defined in {{sec-asn1}}.
+defined in {{sec-asn1}}. This principal appears in the same form as an
+internatialized electronic mail addresses, following the normative rules
+specified by {{Section 7.5 of RFC5280}} and its updates.
 
 ### Format of the otherName Value
 
@@ -612,9 +614,7 @@ id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
 -- NFSv4 User@Domain Principal Structure
 -- As defined in RFC 8881 Section 5.9
 NFSv4Principal ::= SEQUENCE {
-    user       UTF8String,
-    atSign     IA5String (SIZE (1)) (FROM ("@")),
-    domain     UTF8String  -- Supports internationalized domain names
+    principal  UTF8String          -- user@domain string
 }
 
 -- For use in SubjectAltName otherName
