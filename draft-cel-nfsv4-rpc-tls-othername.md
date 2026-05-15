@@ -8,7 +8,6 @@ pi: [toc, sortrefs, symrefs, docmapping]
 stand_alone: yes
 v: 3
 
-submissiontype: IETF
 ipr: trust200902
 area: "Web and Internet Transport"
 workgroup: "Network File System Version 4"
@@ -43,10 +42,9 @@ venue:
 
 --- abstract
 
-This document extends RPC-with-TLS, as described in {{!RFC9289}}, so
-that a client's x.509 certificate may carry instructions to the RPC
-server to execute all RPC transactions from that client as a single
-user identity.
+This document extends RPC-with-TLS so that a client's x.509
+certificate may carry instructions to the RPC server to execute all
+RPC transactions from that client as a single user identity.
 
 --- middle
 
