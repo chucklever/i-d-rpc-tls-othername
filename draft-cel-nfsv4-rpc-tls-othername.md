@@ -269,13 +269,13 @@ of RPC user identity, such as Windows Security Identifiers.
 This section describes how standards action can extend the mechanism
 specified in this document to accommodate new forms of user identity.
 
-Here, we'll provide the base level of general requirements that must be
-met, as instructions to future authors. These are to include:
+Documents that extend this mechanism using Standards Action MUST satisfy
+the following requirements:
 
-- New identity types must define an ASN.1 module
-- Must request IANA OID allocation
-- Should provide security considerations specific to that identity type
-- Should provide examples and test vectors
+- New identity types MUST define an ASN.1 module.
+- New identity types MUST request an IANA OID allocation.
+- New identity types SHOULD provide security considerations specific to that identity type.
+- New identity types SHOULD provide examples and test vectors.
 
 # Client Certificate Generation
 
@@ -515,9 +515,9 @@ Name Forms" registry (1.3.6.1.5.5.7.8):
 
 | Decimal | Description                       | References  |
 |:--------|:----------------------------------|:------------|
-| TBD4    | id-on-rpcAuthSys                  | RFC-TBD     |
-| TBD5    | id-on-gssExportedName             | RFC-TBD     |
-| TBD6    | id-on-nfsv4Principal              | RFC-TBD     |
+| TBD2    | id-on-rpcAuthSys                  | RFC-TBD     |
+| TBD3    | id-on-gssExportedName             | RFC-TBD     |
+| TBD4    | id-on-nfsv4Principal              | RFC-TBD     |
 
 These otherName identifiers are used in the SubjectAltName extension
 of X.509 certificates to carry RPC user identity information for the
