@@ -57,14 +57,13 @@ user identity.
 The Remote Procedure Call version 2 protocol (RPC, for short) has been
 a Proposed Standard for three decades (see {{!RFC5531}} and its
 antecedents).
-Several important upper layer protocols, such as the family of Network
-File System protocols (most recently described in {{!RFC8881}} are based
-on RPC.
+Upper layer protocols such as the Network File System family
+({{!RFC8881}}) are based on RPC.
 
 In 2022, the IETF published {{!RFC9289}}, which specifies a mechanism
 by which RPC transactions can be cryptographically protected during
-transit. This protection includes maintaining confidentiality and
-integrity, and the authentication of the communicating peers.
+transit. RFC 9289 provides confidentiality and integrity of RPC
+traffic and authenticates the communicating peers.
 
 ## Problem Statement
 
@@ -79,37 +78,29 @@ integrity, and the authentication of the communicating peers.
 > utilize the remote TLS peer identity to authenticate RPC users.
 
 Mobile devices such as laptops are typically used by a single user and
-do not have a fixed, well known IP host address or fully qualified DNS name.
-The lack of a well known fixed IP host address or fully qualified DNS name
-weakens the verification checks that may be done on the client's X.509
-certificate by the server.  As such, this extension allows the client to be
-restricted to a single user entity on the server, limiting the scope of risk
-associated with allowing access to the server.
+do not have a fixed, well-known IP address or fully qualified DNS name.
+Without either, the server has fewer verification checks available on
+the client's X.509 certificate.  This extension allows a server to
+restrict access from such a client to a single user identity, limiting
+exposure if that certificate is compromised.
 
-When a service is running in a dedicated VM or container, it often
-runs as a single assigned user identity. Handling this user identity
-using Kerberos is problematic, since Kerberos TGTs typically expire
-in a matter of hours and the service is typically a long running task.
-This extension allows the client to specify the single assigned user
-identity to the server in a manner that will not expire for a significant
-period of time.
+When a service runs in a dedicated VM or container, it often runs as
+a single assigned user identity. Kerberos is poorly suited here:
+TGTs expire in hours, yet the service may run for much longer. This
+extension lets the client convey that identity in the certificate,
+which does not expire on the same short cycle as a TGT.
 
 When an RPC server replaces incoming RPC user identities with a single
 user identity, for brevity we refer to this as "identity squashing".
 
 ## Summary of Proposed Solution
 
-In the interest of enabling the independent creation of interoperating
-implementations of RPC identity squashing, this document proposes the
-use of the x.509 SubjectAltName otherName field to carry a RPC user
-identity.
-For these user squashing instructions,
-this document establishes a fixed object identifier
-carried in the "type-id" part of the otherName field,
-and specifies the format of the "value" part of the otherName
-field when "type-id" carries the new object identifier.
-The document also provides normative guidance on how the "value"
-is to be interpreted by RPC servers.
+To enable interoperable implementations of RPC identity squashing,
+this document specifies the use of the x.509 SubjectAltName otherName
+field to carry an RPC user identity.  The document defines an object
+identifier for the otherName "type-id" field, the corresponding
+"value" field format, and normative guidance on how RPC servers
+interpret that value.
 
 # Requirements Language
 
@@ -157,7 +148,6 @@ to avoid ambiguity. See {{sec-security-considerations}} for details.
 
 1. If the server encounters otherName entries with type-id values it does
 not recognize, it MUST ignore those entries and continue processing.
-This ensures forward compatibility with future extensions.
 
 1. Other types of SubjectAltName entries (dNSName, iPAddress, etc.) are
 processed independently and do not affect identity squashing behavior.
@@ -204,9 +194,8 @@ The original credential information in the RPC header is ignored.
 1. Process the RPC request using the squashed identity for all authorization
 and access control decisions.
 
-Implementations should consider caching the parsed and validated identity
-information at TLS session establishment time to avoid repeated parsing
-for each RPC request.
+Parsing and validating the certificate once at TLS session establishment
+and caching the result avoids per-request overhead.
 
 ## Interoperability with Non-Supporting Servers
 
@@ -215,9 +204,7 @@ the otherName OIDs defined in this document. Such servers MUST ignore
 unrecognized otherName entries per {{Section 4.2.1.6 of RFC5280}}.
 These servers will process RPC requests using the credential information
 contained in the RPC header, subject to their normal authentication and
-authorization policies. This ensures that clients presenting certificates
-with identity squashing otherName fields can interoperate with servers
-that do not support this specification, though without identity squashing.
+authorization policies.
 
 ## AUTH_SYS Identities
 
@@ -296,9 +283,8 @@ RPCAuthSys
 
 GSSExportedName
 : Suitable for environments using GSS-API mechanisms like Kerberos. This
-  format provides the strongest integration with existing enterprise
-  authentication infrastructure but requires that servers support the
-  specific GSS-API mechanism indicated by the nameType OID.
+  format fits naturally into existing GSS-API deployments but requires
+  that servers support the specific mechanism indicated by the nameType OID.
 
 NFSv4Principal
 : Recommended for heterogeneous environments or when human-readable
@@ -336,9 +322,9 @@ consider appropriate validity periods based on their security requirements.
 Shorter validity periods reduce the window of exposure if a certificate is
 compromised, but may increase operational overhead for certificate renewal.
 
-The choice of validity period might also consider whether certificate
-revocation checking (CRL or OCSP) is deployed and how quickly revocation
-information propagates in the environment.
+Administrators should also factor in how quickly certificate revocation
+(CRL or OCSP) propagates in their environment, since that affects how
+long a compromised certificate remains usable after revocation.
 
 # Implementation Status
 
@@ -385,10 +371,9 @@ Implementation experience:
 
 ## General Security Considerations
 
-The security considerations for RPC-with-TLS described in {{Section 8 of RFC9289}}
-apply to this specification. In particular, the discussion about certificate
-validation, trust anchors, and the establishment of secure TLS sessions remains
-relevant.
+The security considerations in {{Section 8 of RFC9289}} apply to this
+specification, including the discussion of certificate validation, trust
+anchors, and TLS session establishment.
 
 ## Identity Squashing and Authorization
 
@@ -399,15 +384,15 @@ implications:
 
 ### Trust in the Certificate Authority
 
-The server MUST carefully consider which Certificate Authorities (CAs) it trusts
-to issue certificates containing the otherName extensions defined in this document.
-A compromised or malicious CA could issue certificates that allow unauthorized
-access to server resources under arbitrary user identities.
+Servers MUST limit which Certificate Authorities (CAs) they trust to
+issue certificates carrying the otherName extensions defined in this
+document.  A compromised or malicious CA could issue certificates that
+grant access to server resources under arbitrary user identities.
 
-Servers SHOULD maintain separate trust anchors for certificates containing
-identity squashing otherName fields versus certificates used solely for TLS
-peer authentication. This allows administrators to tightly control which CAs
-are authorized to assert user identities.
+Servers SHOULD maintain separate trust anchors for identity squashing
+certificates and certificates used solely for TLS peer authentication,
+giving administrators direct control over which CAs may assert user
+identities.
 
 ### Authorization Decisions
 
