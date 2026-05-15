@@ -55,10 +55,10 @@ user identity.
 ## Background
 
 The Remote Procedure Call version 2 protocol (RPC, for short) has been
-a Proposed Standard for three decades (see {{?RFC5531}} and its
+a Proposed Standard for three decades (see {{!RFC5531}} and its
 antecedents).
 Several important upper layer protocols, such as the family of Network
-File System protocols (most recently described in {{?RFC8881}} are based
+File System protocols (most recently described in {{!RFC8881}} are based
 on RPC.
 
 In 2022, the IETF published {{!RFC9289}}, which specifies a mechanism
@@ -233,7 +233,7 @@ structure as defined in {{sec-asn1}}. This structure consists
 of a 32-bit unsigned integer specifying a numeric UID, and a sequence
 of 32-bit unsigned integers specifying numeric GIDs.
 
-The use of these integers is further explained in {{?RFC5531}}.
+The use of these integers is further explained in {{!RFC5531}}.
 
 ## GSS-API Principals
 
@@ -246,7 +246,7 @@ defined in {{sec-asn1}}.
 
 The otherName value contains a GSSExportedName structure as defined in
 {{sec-asn1}}, consisting of a GSS-API mechanism OID and a
-mechanism-specific exported name value as described in {{Section 3.2 of ?RFC2743}}.
+mechanism-specific exported name value as described in {{Section 3.2 of !RFC2743}}.
 
 ## NFSv4 User @ Domain String Identities
 
@@ -348,7 +348,7 @@ information propagates in the environment.
 This section records the status of known implementations of the
 protocol defined by this specification at the time of posting of this
 Internet-Draft, and is based on a proposal described in
-{{!RFC7942}}. The description of implementations in this section is
+{{?RFC7942}}. The description of implementations in this section is
 intended to assist the IETF in its decision processes in progressing
 drafts to RFCs.
 
@@ -427,7 +427,7 @@ operations under the specified identity.
 
 When processing NFSv4Principal otherName values, servers MUST apply the same
 name canonicalization and domain validation procedures described in
-{{Section 5.9 of RFC8881}}. In particular:
+{{Section 5.9 of !RFC8881}}. In particular:
 
 - Domain names SHOULD be validated against expected domain suffixes
 - Internationalized domain names MUST be properly normalized
@@ -534,7 +534,7 @@ The following ASN.1 module normatively specifies the structure of
 the new otherName values described in this document.
 This specification uses the ASN.1 definitions from
 {{?RFC5912}} with the 2002 ASN.1 notation used in that document.
-{{RFC5912}} updates normative documents using older ASN.1 notation.
+{{?RFC5912}} updates normative documents using older ASN.1 notation.
 
 ## RPC TLS Identity Squashing Module
 
@@ -687,7 +687,7 @@ Note: YY represents the TBD value for id-on-gssExportedName.
 The nameValue field contains the GSS-API exported name token format
 as defined by the Kerberos V5 mechanism. The first four bytes
 (04 01 00 0B) are the token ID and length fields defined in
-{{Section 3.2 of RFC2743}}.
+{{Section 3.2 of !RFC2743}}.
 
 ## RPC AUTH_SYS Example
 
