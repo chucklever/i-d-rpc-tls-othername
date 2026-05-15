@@ -148,7 +148,7 @@ extension.
 
 1. If the server finds an otherName with a type-id that matches one of
 the identity squashing OIDs defined in this document (id-on-rpcAuthSys,
-id-on-gssExportedName, or id-on-nfsv4Principal), it SHOULD extract
+id-on-gssExportedName, or id-on-nfsv4Principal), it MUST extract
 and validate the identity information from that otherName.
 
 1. If multiple identity squashing otherName fields are present in the
