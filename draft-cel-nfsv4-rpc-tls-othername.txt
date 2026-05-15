@@ -5,8 +5,7 @@
 Network File System Version 4                                 R. Macklem
 Internet-Draft                                                   FreeBSD
 Intended status: Standards Track                           C. Lever, Ed.
-Expires: 25 May 2026                                              Oracle
-                                                        21 November 2025
+Expires: 16 November 2026                                    15 May 2026
 
 
  Remote Procedure Call Identity Squashing via x.509 Certificate Fields
@@ -14,10 +13,9 @@ Expires: 25 May 2026                                              Oracle
 
 Abstract
 
-   This document extends RPC-with-TLS, as described in [RFC9289], so
-   that a client's x.509 certificate may carry instructions to the RPC
-   server to execute all RPC transactions from that client as a single
-   user identity.
+   This document extends RPC-with-TLS so that a client's x.509
+   certificate may carry instructions to the RPC server to execute all
+   RPC transactions from that client as a single user identity.
 
 About This Document
 
@@ -52,11 +50,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 May 2026.
+   This Internet-Draft will expire on 16 November 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -132,14 +130,13 @@ Table of Contents
 
    The Remote Procedure Call version 2 protocol (RPC, for short) has
    been a Proposed Standard for three decades (see [RFC5531] and its
-   antecedents).  Several important upper layer protocols, such as the
-   family of Network File System protocols (most recently described in
-   [RFC8881] are based on RPC.
+   antecedents).  Upper layer protocols such as the Network File System
+   family ([RFC8881]) are based on RPC.
 
    In 2022, the IETF published [RFC9289], which specifies a mechanism by
    which RPC transactions can be cryptographically protected during
-   transit.  This protection includes maintaining confidentiality and
-   integrity, and the authentication of the communicating peers.
+   transit.  RFC 9289 provides confidentiality and integrity of RPC
+   traffic and authenticates the communicating peers.
 
 1.2.  Problem Statement
 
@@ -154,21 +151,17 @@ Table of Contents
       utilize the remote TLS peer identity to authenticate RPC users.
 
    Mobile devices such as laptops are typically used by a single user
-   and do not have a fixed, well known IP host address or fully
-   qualified DNS name.  The lack of a well known fixed IP host address
-   or fully qualified DNS name weakens the verification checks that may
-   be done on the client's X.509 certificate by the server.  As such,
-   this extension allows the client to be restricted to a single user
-   entity on the server, limiting the scope of risk associated with
-   allowing access to the server.
+   and do not have a fixed, well-known IP address or fully qualified DNS
+   name.  Without either, the server has fewer verification checks
+   available on the client's X.509 certificate.  This extension allows a
+   server to restrict access from such a client to a single user
+   identity, limiting exposure if that certificate is compromised.
 
-   When a service is running in a dedicated VM or container, it often
-   runs as a single assigned user identity.  Handling this user identity
-   using Kerberos is problematic, since Kerberos TGTs typically expire
-   in a matter of hours and the service is typically a long running
-   task.  This extension allows the client to specify the single
-   assigned user identity to the server in a manner that will not expire
-   for a significant period of time.
+   When a service runs in a dedicated VM or container, it often runs as
+   a single assigned user identity.  Kerberos is poorly suited here:
+   TGTs expire in hours, yet the service may run for much longer.  This
+   extension lets the client convey that identity in the certificate,
+   which does not expire on the same short cycle as a TGT.
 
    When an RPC server replaces incoming RPC user identities with a
    single user identity, for brevity we refer to this as "identity
@@ -176,15 +169,12 @@ Table of Contents
 
 1.3.  Summary of Proposed Solution
 
-   In the interest of enabling the independent creation of
-   interoperating implementations of RPC identity squashing, this
-   document proposes the use of the x.509 SubjectAltName otherName field
-   to carry a RPC user identity.  For these user squashing instructions,
-   this document establishes a fixed object identifier carried in the
-   "type-id" part of the otherName field, and specifies the format of
-   the "value" part of the otherName field when "type-id" carries the
-   new object identifier.  The document also provides normative guidance
-   on how the "value" is to be interpreted by RPC servers.
+   To enable interoperable implementations of RPC identity squashing,
+   this document specifies the use of the x.509 SubjectAltName otherName
+   field to carry an RPC user identity.  The document defines an object
+   identifier for the otherName "type-id" field, the corresponding
+   "value" field format, and normative guidance on how RPC servers
+   interpret that value.
 
 2.  Requirements Language
 
@@ -229,7 +219,7 @@ Table of Contents
    2.  If the server finds an otherName with a type-id that matches one
        of the identity squashing OIDs defined in this document (id-on-
        rpcAuthSys, id-on-gssExportedName, or id-on-nfsv4Principal), it
-       SHOULD extract and validate the identity information from that
+       MUST extract and validate the identity information from that
        otherName.
 
    3.  If multiple identity squashing otherName fields are present in
@@ -238,8 +228,7 @@ Table of Contents
 
    4.  If the server encounters otherName entries with type-id values it
        does not recognize, it MUST ignore those entries and continue
-       processing.  This ensures forward compatibility with future
-       extensions.
+       processing.
 
    5.  Other types of SubjectAltName entries (dNSName, iPAddress, etc.)
        are processed independently and do not affect identity squashing
@@ -296,9 +285,8 @@ Table of Contents
    7.  Process the RPC request using the squashed identity for all
        authorization and access control decisions.
 
-   Implementations should consider caching the parsed and validated
-   identity information at TLS session establishment time to avoid
-   repeated parsing for each RPC request.
+   Parsing and validating the certificate once at TLS session
+   establishment and caching the result avoids per-request overhead.
 
 3.3.  Interoperability with Non-Supporting Servers
 
@@ -307,10 +295,7 @@ Table of Contents
    MUST ignore unrecognized otherName entries per Section 4.2.1.6 of
    [RFC5280].  These servers will process RPC requests using the
    credential information contained in the RPC header, subject to their
-   normal authentication and authorization policies.  This ensures that
-   clients presenting certificates with identity squashing otherName
-   fields can interoperate with servers that do not support this
-   specification, though without identity squashing.
+   normal authentication and authorization policies.
 
 3.4.  AUTH_SYS Identities
 
@@ -347,10 +332,7 @@ Table of Contents
 3.6.1.  otherName OID for String Identities
 
    The otherName OID for NFSv4 user@domain principals is id-on-
-   nfsv4Principal, defined in Appendix A.  This principal appears in the
-   same form as an internatialized electronic mail addresses, following
-   the normative rules specified by Section 7.5 of [RFC5280] and its
-   updates.
+   nfsv4Principal, defined in Appendix A.
 
 3.6.2.  Format of the otherName Value
 
@@ -366,17 +348,17 @@ Table of Contents
    This section describes how standards action can extend the mechanism
    specified in this document to accommodate new forms of user identity.
 
-   Here, we'll provide the base level of general requirements that must
-   be met, as instructions to future authors.  These are to include:
+   Documents that extend this mechanism using Standards Action MUST
+   satisfy the following requirements:
 
-   *  New identity types must define an ASN.1 module
+   *  New identity types MUST define an ASN.1 module.
 
-   *  Must request IANA OID allocation
+   *  New identity types MUST request an IANA OID allocation.
 
-   *  Should provide security considerations specific to that identity
-      type
+   *  New identity types SHOULD provide security considerations specific
+      to that identity type.
 
-   *  Should provide examples and test vectors
+   *  New identity types SHOULD provide examples and test vectors.
 
 5.  Client Certificate Generation
 
@@ -396,10 +378,9 @@ Table of Contents
       user database.
 
    GSSExportedName  Suitable for environments using GSS-API mechanisms
-      like Kerberos.  This format provides the strongest integration
-      with existing enterprise authentication infrastructure but
-      requires that servers support the specific GSS-API mechanism
-      indicated by the nameType OID.
+      like Kerberos.  This format fits naturally into existing GSS-API
+      deployments but requires that servers support the specific
+      mechanism indicated by the nameType OID.
 
    NFSv4Principal  Recommended for heterogeneous environments or when
       human-readable identities are preferred.  The user@domain format
@@ -437,9 +418,10 @@ Table of Contents
    window of exposure if a certificate is compromised, but may increase
    operational overhead for certificate renewal.
 
-   The choice of validity period might also consider whether certificate
-   revocation checking (CRL or OCSP) is deployed and how quickly
-   revocation information propagates in the environment.
+   Administrators should also factor in how quickly certificate
+   revocation (CRL or OCSP) propagates in their environment, since that
+   affects how long a compromised certificate remains usable after
+   revocation.
 
 6.  Implementation Status
 
@@ -480,10 +462,9 @@ Table of Contents
 
 7.1.  General Security Considerations
 
-   The security considerations for RPC-with-TLS described in Section 8
-   of [RFC9289] apply to this specification.  In particular, the
-   discussion about certificate validation, trust anchors, and the
-   establishment of secure TLS sessions remains relevant.
+   The security considerations in Section 8 of [RFC9289] apply to this
+   specification, including the discussion of certificate validation,
+   trust anchors, and TLS session establishment.
 
 7.2.  Identity Squashing and Authorization
 
@@ -494,17 +475,16 @@ Table of Contents
 
 7.2.1.  Trust in the Certificate Authority
 
-   The server MUST carefully consider which Certificate Authorities
-   (CAs) it trusts to issue certificates containing the otherName
-   extensions defined in this document.  A compromised or malicious CA
-   could issue certificates that allow unauthorized access to server
-   resources under arbitrary user identities.
-
-   Servers SHOULD maintain separate trust anchors for certificates
-   containing identity squashing otherName fields versus certificates
-   used solely for TLS peer authentication.  This allows administrators
-   to tightly control which CAs are authorized to assert user
+   Servers MUST limit which Certificate Authorities (CAs) they trust to
+   issue certificates carrying the otherName extensions defined in this
+   document.  A compromised or malicious CA could issue certificates
+   that grant access to server resources under arbitrary user
    identities.
+
+   Servers SHOULD maintain separate trust anchors for identity squashing
+   certificates and certificates used solely for TLS peer
+   authentication, giving administrators direct control over which CAs
+   may assert user identities.
 
 7.2.2.  Authorization Decisions
 
@@ -630,11 +610,11 @@ Table of Contents
              +=========+=======================+============+
              | Decimal | Description           | References |
              +=========+=======================+============+
-             | TBD4    | id-on-rpcAuthSys      | RFC-TBD    |
+             | TBD2    | id-on-rpcAuthSys      | RFC-TBD    |
              +---------+-----------------------+------------+
-             | TBD5    | id-on-gssExportedName | RFC-TBD    |
+             | TBD3    | id-on-gssExportedName | RFC-TBD    |
              +---------+-----------------------+------------+
-             | TBD6    | id-on-nfsv4Principal  | RFC-TBD    |
+             | TBD4    | id-on-nfsv4Principal  | RFC-TBD    |
              +---------+-----------------------+------------+
 
                                  Table 2
@@ -655,20 +635,29 @@ Table of Contents
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
 
+   [RFC2743]  Linn, J., "Generic Security Service Application Program
+              Interface Version 2, Update 1", RFC 2743,
+              DOI 10.17487/RFC2743, January 2000,
+              <https://www.rfc-editor.org/rfc/rfc2743>.
+
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/rfc/rfc5280>.
 
-   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
-              Code: The Implementation Status Section", BCP 205,
-              RFC 7942, DOI 10.17487/RFC7942, July 2016,
-              <https://www.rfc-editor.org/rfc/rfc7942>.
+   [RFC5531]  Thurlow, R., "RPC: Remote Procedure Call Protocol
+              Specification Version 2", RFC 5531, DOI 10.17487/RFC5531,
+              May 2009, <https://www.rfc-editor.org/rfc/rfc5531>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
+              Version 4 Minor Version 1 Protocol", RFC 8881,
+              DOI 10.17487/RFC8881, August 2020,
+              <https://www.rfc-editor.org/rfc/rfc8881>.
 
    [RFC9289]  Myklebust, T. and C. Lever, Ed., "Towards Remote Procedure
               Call Encryption by Default", RFC 9289,
@@ -677,30 +666,21 @@ Table of Contents
 
 9.2.  Informative References
 
-   [RFC2743]  Linn, J., "Generic Security Service Application Program
-              Interface Version 2, Update 1", RFC 2743,
-              DOI 10.17487/RFC2743, January 2000,
-              <https://www.rfc-editor.org/rfc/rfc2743>.
-
    [RFC4121]  Zhu, L., Jaganathan, K., and S. Hartman, "The Kerberos
               Version 5 Generic Security Service Application Program
               Interface (GSS-API) Mechanism: Version 2", RFC 4121,
               DOI 10.17487/RFC4121, July 2005,
               <https://www.rfc-editor.org/rfc/rfc4121>.
 
-   [RFC5531]  Thurlow, R., "RPC: Remote Procedure Call Protocol
-              Specification Version 2", RFC 5531, DOI 10.17487/RFC5531,
-              May 2009, <https://www.rfc-editor.org/rfc/rfc5531>.
-
    [RFC5912]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for the
               Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
               DOI 10.17487/RFC5912, June 2010,
               <https://www.rfc-editor.org/rfc/rfc5912>.
 
-   [RFC8881]  Noveck, D., Ed. and C. Lever, "Network File System (NFS)
-              Version 4 Minor Version 1 Protocol", RFC 8881,
-              DOI 10.17487/RFC8881, August 2020,
-              <https://www.rfc-editor.org/rfc/rfc8881>.
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/rfc/rfc7942>.
 
 Appendix A.  ASN.1 Module
 
@@ -809,18 +789,16 @@ B.1.  NFSv4 Principal Example
        otherName [0] IMPLICIT SEQUENCE {
            type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
            value [0] EXPLICIT NFSv4Principal ::= {
-               user "alice",
-               atSign "@",
-               domain "nfs.example.com"
+               principal "alice@nfs.example.com"
            }
        }
    }
 
    DER encoding (hexadecimal):
 
-   30 2B A0 29 06 08 2B 06 01 05 05 07 08 XX A0 1D
-   0C 05 61 6C 69 63 65 13 01 40 0C 0F 6E 66 73 2E
-   65 78 61 6D 70 6C 65 2E 63 6F 6D
+   30 27 A0 25 06 08 2B 06 01 05 05 07 08 XX A0 19
+   30 17 0C 15 61 6C 69 63 65 40 6E 66 73 2E 65 78
+   61 6D 70 6C 65 2E 63 6F 6D
 
    Note: XX represents the TBD value for id-on-nfsv4Principal.
 
@@ -914,18 +892,16 @@ B.5.  Internationalized Domain Name Example
        otherName [0] IMPLICIT SEQUENCE {
            type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
            value [0] EXPLICIT NFSv4Principal ::= {
-               user "用户",        -- Chinese characters for "user"
-               atSign "@",
-               domain "例え.jp"    -- Japanese IDN
+               principal "用户@例え.jp"    -- UTF-8 encoded user@domain
            }
        }
    }
 
    DER encoding (hexadecimal):
 
-   30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
-   0C 06 E7 94 A8 E6 88 B7 13 01 40 0C 0C E4 BE 8B
-   E3 81 88 2E 6A 70
+   30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
+   30 12 0C 10 E7 94 A8 E6 88 B7 40 E4 BE 8B E3 81
+   88 2E 6A 70
 
    Note: The UTF-8 encoding of the Chinese characters "用户" is E7 94 A8
    E6 88 B7, and the Japanese text "例え" is E4 BE 8B E3 81 88.
@@ -942,30 +918,25 @@ B.6.1.  Valid NFSv4Principal Test Cases
 
    Input:
 
-   *  user: "bob"
-
-   *  domain: "example.org"
+   *  principal: "bob@example.org"
 
    Expected DER encoding:
 
-   30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
-   0C 03 62 6F 62 13 01 40 0C 0B 65 78 61 6D 70 6C
-   65 2E 6F 72 67
+   30 21 A0 1F 06 08 2B 06 01 05 05 07 08 XX A0 13
+   30 11 0C 0F 62 6F 62 40 65 78 61 6D 70 6C 65 2E
+   6F 72 67
 
    Test Case 2: User with numbers and domain with subdomain
 
    Input:
 
-   *  user: "user123"
-
-   *  domain: "nfs.lab.example.com"
+   *  principal: "user123@nfs.lab.example.com"
 
    Expected DER encoding:
 
-   30 2F A0 2D 06 08 2B 06 01 05 05 07 08 XX A0 21
-   0C 07 75 73 65 72 31 32 33 13 01 40 0C 14 6E 66
-   73 2E 6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F
-   6D
+   30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
+   30 1D 0C 1B 75 73 65 72 31 32 33 40 6E 66 73 2E
+   6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F 6D
 
 B.6.2.  Valid RPCAuthSys Test Cases
 
@@ -1013,17 +984,14 @@ B.6.3.  Invalid Test Cases
 
    These test cases should be rejected by conforming implementations:
 
-   Test Case 1: NFSv4Principal with missing atSign field
+   Test Case 1: NFSv4Principal with missing '@' separator
 
    Input (malformed):
 
-   *  user: "alice"
+   *  principal: "aliceexample.com" (no '@' character present)
 
-   *  atSign: "" (empty)
-
-   *  domain: "example.com"
-
-   Expected result: Parsing failure
+   Expected result: Rejection by server (invalid principal string
+   format)
 
    Test Case 2: RPCAuthSys with UID exceeding 32-bit range
 
@@ -1061,6 +1029,5 @@ Authors' Addresses
 
 
    Chuck Lever (editor)
-   Oracle Corporation
    United States of America
-   Email: chuck.lever@oracle.com
+   Email: cel-ietf@chucklever.net

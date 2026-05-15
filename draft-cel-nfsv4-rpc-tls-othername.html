@@ -8,12 +8,11 @@
 <meta content="Rick Macklem" name="author">
 <meta content="Chuck Lever" name="author">
 <meta content="
-       This document extends RPC-with-TLS, as described in  , so
-that a client's x.509 certificate may carry instructions to the RPC
-server to execute all RPC transactions from that client as a single
-user identity. 
+       This document extends RPC-with-TLS so that a client's x.509
+certificate may carry instructions to the RPC server to execute all
+RPC transactions from that client as a single user identity. 
     " name="description">
-<meta content="xml2rfc 3.31.0" name="generator">
+<meta content="xml2rfc 3.33.0" name="generator">
 <meta content="x.509" name="keyword">
 <meta content="SubjectAltName" name="keyword">
 <meta content="otherName" name="keyword">
@@ -21,18 +20,18 @@ user identity.
 <meta content="SunRPC" name="keyword">
 <meta content="draft-cel-nfsv4-rpc-tls-othername-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.31.0
-    Python 3.12.12
+  xml2rfc 3.33.0
+    Python 3.12.13
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
-    intervaltree 3.1.0
+    intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 5.3.1
-    platformdirs 4.5.0
+    lxml 6.0.2
+    platformdirs 4.9.6
     pycountry 24.6.1
-    PyYAML 6.0.2
-    requests 2.32.5
-    wcwidth 0.2.14
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.7.0
 -->
 <link href="draft-cel-nfsv4-rpc-tls-othername.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -173,7 +172,7 @@ user identity.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
   font-family: 'Oxygen Mono';
@@ -181,7 +180,8 @@ user identity.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 }
 
 @font-face {
@@ -573,6 +573,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -643,7 +644,7 @@ a.pilcrow {
   }
 }
 @media not print {
-  :hover > a.pilcrow {
+  :hover > a.pilcrow, a.pilcrow:focus {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
@@ -1051,11 +1052,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SunRPC x.509 Identity Squashing</td>
-<td class="right">November 2025</td>
+<td class="right">May 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Macklem &amp; Lever</td>
-<td class="center">Expires 25 May 2026</td>
+<td class="center">Expires 16 November 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1069,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-othername-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-11-21" class="published">21 November 2025</time>
+<time datetime="2026-05-15" class="published">15 May 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-05-25">25 May 2026</time></dd>
+<dd class="expires"><time datetime="2026-11-16">16 November 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1083,7 +1084,6 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div class="author">
       <div class="author-name">C. Lever, <span class="editor">Ed.</span>
 </div>
-<div class="org">Oracle</div>
 </div>
 </dd>
 </dl>
@@ -1091,10 +1091,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Remote Procedure Call Identity Squashing via x.509 Certificate Fields</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document extends RPC-with-TLS, as described in <span>[<a href="#RFC9289" class="cite xref">RFC9289</a>]</span>, so
-that a client's x.509 certificate may carry instructions to the RPC
-server to execute all RPC transactions from that client as a single
-user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document extends RPC-with-TLS so that a client's x.509
+certificate may carry instructions to the RPC server to execute all
+RPC transactions from that client as a single user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1131,7 +1130,7 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 16 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1140,7 +1139,7 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2025 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1370,13 +1369,12 @@ user identity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-1.1-1">The Remote Procedure Call version 2 protocol (RPC, for short) has been
 a Proposed Standard for three decades (see <span>[<a href="#RFC5531" class="cite xref">RFC5531</a>]</span> and its
 antecedents).
-Several important upper layer protocols, such as the family of Network
-File System protocols (most recently described in <span>[<a href="#RFC8881" class="cite xref">RFC8881</a>]</span> are based
-on RPC.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+Upper layer protocols such as the Network File System family
+(<span>[<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>) are based on RPC.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
 <p id="section-1.1-2">In 2022, the IETF published <span>[<a href="#RFC9289" class="cite xref">RFC9289</a>]</span>, which specifies a mechanism
 by which RPC transactions can be cryptographically protected during
-transit. This protection includes maintaining confidentiality and
-integrity, and the authentication of the communicating peers.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+transit. RFC 9289 provides confidentiality and integrity of RPC
+traffic and authenticates the communicating peers.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="problem-statement">
@@ -1397,19 +1395,16 @@ utilize the remote TLS peer identity to authenticate RPC users.<a href="#section
 </li>
         </ul>
 <p id="section-1.2-3">Mobile devices such as laptops are typically used by a single user and
-do not have a fixed, well known IP host address or fully qualified DNS name.
-The lack of a well known fixed IP host address or fully qualified DNS name
-weakens the verification checks that may be done on the client's X.509
-certificate by the server.  As such, this extension allows the client to be
-restricted to a single user entity on the server, limiting the scope of risk
-associated with allowing access to the server.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
-<p id="section-1.2-4">When a service is running in a dedicated VM or container, it often
-runs as a single assigned user identity. Handling this user identity
-using Kerberos is problematic, since Kerberos TGTs typically expire
-in a matter of hours and the service is typically a long running task.
-This extension allows the client to specify the single assigned user
-identity to the server in a manner that will not expire for a significant
-period of time.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
+do not have a fixed, well-known IP address or fully qualified DNS name.
+Without either, the server has fewer verification checks available on
+the client's X.509 certificate.  This extension allows a server to
+restrict access from such a client to a single user identity, limiting
+exposure if that certificate is compromised.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+<p id="section-1.2-4">When a service runs in a dedicated VM or container, it often runs as
+a single assigned user identity. Kerberos is poorly suited here:
+TGTs expire in hours, yet the service may run for much longer. This
+extension lets the client convey that identity in the certificate,
+which does not expire on the same short cycle as a TGT.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
 <p id="section-1.2-5">When an RPC server replaces incoming RPC user identities with a single
 user identity, for brevity we refer to this as "identity squashing".<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 </section>
@@ -1419,17 +1414,12 @@ user identity, for brevity we refer to this as "identity squashing".<a href="#se
         <h3 id="name-summary-of-proposed-solutio">
 <a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-summary-of-proposed-solutio" class="section-name selfRef">Summary of Proposed Solution</a>
         </h3>
-<p id="section-1.3-1">In the interest of enabling the independent creation of interoperating
-implementations of RPC identity squashing, this document proposes the
-use of the x.509 SubjectAltName otherName field to carry a RPC user
-identity.
-For these user squashing instructions,
-this document establishes a fixed object identifier
-carried in the "type-id" part of the otherName field,
-and specifies the format of the "value" part of the otherName
-field when "type-id" carries the new object identifier.
-The document also provides normative guidance on how the "value"
-is to be interpreted by RPC servers.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+<p id="section-1.3-1">To enable interoperable implementations of RPC identity squashing,
+this document specifies the use of the x.509 SubjectAltName otherName
+field to carry an RPC user identity.  The document defines an object
+identifier for the otherName "type-id" field, the corresponding
+"value" field format, and normative guidance on how RPC servers
+interpret that value.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1486,7 +1476,7 @@ extension.<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
           <li id="section-3.1-2.2">
             <p id="section-3.1-2.2.1">If the server finds an otherName with a type-id that matches one of
 the identity squashing OIDs defined in this document (id-on-rpcAuthSys,
-id-on-gssExportedName, or id-on-nfsv4Principal), it <span class="bcp14">SHOULD</span> extract
+id-on-gssExportedName, or id-on-nfsv4Principal), it <span class="bcp14">MUST</span> extract
 and validate the identity information from that otherName.<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-3.1-2.3">
@@ -1496,8 +1486,7 @@ to avoid ambiguity. See <a href="#sec-security-considerations" class="auto inter
 </li>
           <li id="section-3.1-2.4">
             <p id="section-3.1-2.4.1">If the server encounters otherName entries with type-id values it does
-not recognize, it <span class="bcp14">MUST</span> ignore those entries and continue processing.
-This ensures forward compatibility with future extensions.<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+not recognize, it <span class="bcp14">MUST</span> ignore those entries and continue processing.<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-3.1-2.5">
             <p id="section-3.1-2.5.1">Other types of SubjectAltName entries (dNSName, iPAddress, etc.) are
@@ -1567,9 +1556,8 @@ The original credential information in the RPC header is ignored.<a href="#secti
 and access control decisions.<a href="#section-3.2-3.7.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-3.2-4">Implementations should consider caching the parsed and validated identity
-information at TLS session establishment time to avoid repeated parsing
-for each RPC request.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">Parsing and validating the certificate once at TLS session establishment
+and caching the result avoids per-request overhead.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="interoperability-with-non-supporting-servers">
@@ -1582,9 +1570,7 @@ the otherName OIDs defined in this document. Such servers <span class="bcp14">MU
 unrecognized otherName entries per <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.6" class="relref">Section 4.2.1.6</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.
 These servers will process RPC requests using the credential information
 contained in the RPC header, subject to their normal authentication and
-authorization policies. This ensures that clients presenting certificates
-with identity squashing otherName fields can interoperate with servers
-that do not support this specification, though without identity squashing.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+authorization policies.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authsys-identities">
@@ -1652,9 +1638,7 @@ mechanism-specific exported name value as described in <span><a href="https://rf
 <a href="#section-3.6.1" class="section-number selfRef">3.6.1. </a><a href="#name-othername-oid-for-string-id" class="section-name selfRef">otherName OID for String Identities</a>
           </h4>
 <p id="section-3.6.1-1">The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
-defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>. This principal appears in the same form as an
-internatialized electronic mail addresses, following the normative rules
-specified by <span><a href="https://rfc-editor.org/rfc/rfc5280#section-7.5" class="relref">Section 7.5</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> and its updates.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value-2">
@@ -1681,20 +1665,20 @@ literal "@" character, and a UTF-8 encoded domain name, as described in
 of RPC user identity, such as Windows Security Identifiers.
 This section describes how standards action can extend the mechanism
 specified in this document to accommodate new forms of user identity.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Here, we'll provide the base level of general requirements that must be
-met, as instructions to future authors. These are to include:<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-2">Documents that extend this mechanism using Standards Action <span class="bcp14">MUST</span> satisfy
+the following requirements:<a href="#section-4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4-3.1">
-          <p id="section-4-3.1.1">New identity types must define an ASN.1 module<a href="#section-4-3.1.1" class="pilcrow">¶</a></p>
+          <p id="section-4-3.1.1">New identity types <span class="bcp14">MUST</span> define an ASN.1 module.<a href="#section-4-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-3.2">
-          <p id="section-4-3.2.1">Must request IANA OID allocation<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+          <p id="section-4-3.2.1">New identity types <span class="bcp14">MUST</span> request an IANA OID allocation.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-3.3">
-          <p id="section-4-3.3.1">Should provide security considerations specific to that identity type<a href="#section-4-3.3.1" class="pilcrow">¶</a></p>
+          <p id="section-4-3.3.1">New identity types <span class="bcp14">SHOULD</span> provide security considerations specific to that identity type.<a href="#section-4-3.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-3.4">
-          <p id="section-4-3.4.1">Should provide examples and test vectors<a href="#section-4-3.4.1" class="pilcrow">¶</a></p>
+          <p id="section-4-3.4.1">New identity types <span class="bcp14">SHOULD</span> provide examples and test vectors.<a href="#section-4-3.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1726,9 +1710,8 @@ certificate and the server's user database.<a href="#section-5.1-2.2.1" class="p
 <dt id="section-5.1-2.3">GSSExportedName</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.4">
             <p id="section-5.1-2.4.1">Suitable for environments using GSS-API mechanisms like Kerberos. This
-format provides the strongest integration with existing enterprise
-authentication infrastructure but requires that servers support the
-specific GSS-API mechanism indicated by the nameType OID.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+format fits naturally into existing GSS-API deployments but requires
+that servers support the specific mechanism indicated by the nameType OID.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-2.5">NFSv4Principal</dt>
@@ -1786,9 +1769,9 @@ to server resources under a specific user identity. Administrators should
 consider appropriate validity periods based on their security requirements.
 Shorter validity periods reduce the window of exposure if a certificate is
 compromised, but may increase operational overhead for certificate renewal.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">The choice of validity period might also consider whether certificate
-revocation checking (CRL or OCSP) is deployed and how quickly revocation
-information propagates in the environment.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">Administrators should also factor in how quickly certificate revocation
+(CRL or OCSP) propagates in their environment, since that affects how
+long a compromised certificate remains usable after revocation.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1866,10 +1849,9 @@ using an OID from the FreeBSD arc.<a href="#section-6.1-1.8.1" class="pilcrow">�
         <h3 id="name-general-security-considerat">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-general-security-considerat" class="section-name selfRef">General Security Considerations</a>
         </h3>
-<p id="section-7.1-1">The security considerations for RPC-with-TLS described in <span><a href="https://rfc-editor.org/rfc/rfc9289#section-8" class="relref">Section 8</a> of [<a href="#RFC9289" class="cite xref">RFC9289</a>]</span>
-apply to this specification. In particular, the discussion about certificate
-validation, trust anchors, and the establishment of secure TLS sessions remains
-relevant.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-1">The security considerations in <span><a href="https://rfc-editor.org/rfc/rfc9289#section-8" class="relref">Section 8</a> of [<a href="#RFC9289" class="cite xref">RFC9289</a>]</span> apply to this
+specification, including the discussion of certificate validation, trust
+anchors, and TLS session establishment.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="identity-squashing-and-authorization">
@@ -1886,14 +1868,14 @@ implications:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
           <h4 id="name-trust-in-the-certificate-au">
 <a href="#section-7.2.1" class="section-number selfRef">7.2.1. </a><a href="#name-trust-in-the-certificate-au" class="section-name selfRef">Trust in the Certificate Authority</a>
           </h4>
-<p id="section-7.2.1-1">The server <span class="bcp14">MUST</span> carefully consider which Certificate Authorities (CAs) it trusts
-to issue certificates containing the otherName extensions defined in this document.
-A compromised or malicious CA could issue certificates that allow unauthorized
-access to server resources under arbitrary user identities.<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.2.1-2">Servers <span class="bcp14">SHOULD</span> maintain separate trust anchors for certificates containing
-identity squashing otherName fields versus certificates used solely for TLS
-peer authentication. This allows administrators to tightly control which CAs
-are authorized to assert user identities.<a href="#section-7.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.2.1-1">Servers <span class="bcp14">MUST</span> limit which Certificate Authorities (CAs) they trust to
+issue certificates carrying the otherName extensions defined in this
+document.  A compromised or malicious CA could issue certificates that
+grant access to server resources under arbitrary user identities.<a href="#section-7.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.2.1-2">Servers <span class="bcp14">SHOULD</span> maintain separate trust anchors for identity squashing
+certificates and certificates used solely for TLS peer authentication,
+giving administrators direct control over which CAs may assert user
+identities.<a href="#section-7.2.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authorization-decisions">
@@ -2091,17 +2073,17 @@ Name Forms" registry (1.3.6.1.5.5.7.8):<a href="#section-8.2-1" class="pilcrow">
           </thead>
           <tbody>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD4</td>
+              <td class="text-left" rowspan="1" colspan="1">TBD2</td>
               <td class="text-left" rowspan="1" colspan="1">id-on-rpcAuthSys</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD5</td>
+              <td class="text-left" rowspan="1" colspan="1">TBD3</td>
               <td class="text-left" rowspan="1" colspan="1">id-on-gssExportedName</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">TBD6</td>
+              <td class="text-left" rowspan="1" colspan="1">TBD4</td>
               <td class="text-left" rowspan="1" colspan="1">id-on-nfsv4Principal</td>
               <td class="text-left" rowspan="1" colspan="1">RFC-TBD</td>
             </tr>
@@ -2131,17 +2113,25 @@ document is published.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2743">[RFC2743]</dt>
+        <dd>
+<span class="refAuthor">Linn, J.</span>, <span class="refTitle">"Generic Security Service Application Program Interface Version 2, Update 1"</span>, <span class="seriesInfo">RFC 2743</span>, <span class="seriesInfo">DOI 10.17487/RFC2743</span>, <time datetime="2000-01" class="refDate">January 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2743">https://www.rfc-editor.org/rfc/rfc2743</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC5280">[RFC5280]</dt>
         <dd>
 <span class="refAuthor">Cooper, D.</span>, <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Farrell, S.</span>, <span class="refAuthor">Boeyen, S.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5280">https://www.rfc-editor.org/rfc/rfc5280</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC7942">[RFC7942]</dt>
+<dt id="RFC5531">[RFC5531]</dt>
         <dd>
-<span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
+<span class="refAuthor">Thurlow, R.</span>, <span class="refTitle">"RPC: Remote Procedure Call Protocol Specification Version 2"</span>, <span class="seriesInfo">RFC 5531</span>, <span class="seriesInfo">DOI 10.17487/RFC5531</span>, <time datetime="2009-05" class="refDate">May 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5531">https://www.rfc-editor.org/rfc/rfc5531</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8881">[RFC8881]</dt>
+        <dd>
+<span class="refAuthor">Noveck, D., Ed.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Network File System (NFS) Version 4 Minor Version 1 Protocol"</span>, <span class="seriesInfo">RFC 8881</span>, <span class="seriesInfo">DOI 10.17487/RFC8881</span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8881">https://www.rfc-editor.org/rfc/rfc8881</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9289">[RFC9289]</dt>
       <dd>
@@ -2156,25 +2146,17 @@ document is published.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="RFC2743">[RFC2743]</dt>
-        <dd>
-<span class="refAuthor">Linn, J.</span>, <span class="refTitle">"Generic Security Service Application Program Interface Version 2, Update 1"</span>, <span class="seriesInfo">RFC 2743</span>, <span class="seriesInfo">DOI 10.17487/RFC2743</span>, <time datetime="2000-01" class="refDate">January 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2743">https://www.rfc-editor.org/rfc/rfc2743</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC4121">[RFC4121]</dt>
         <dd>
 <span class="refAuthor">Zhu, L.</span>, <span class="refAuthor">Jaganathan, K.</span>, and <span class="refAuthor">S. Hartman</span>, <span class="refTitle">"The Kerberos Version 5 Generic Security Service Application Program Interface (GSS-API) Mechanism: Version 2"</span>, <span class="seriesInfo">RFC 4121</span>, <span class="seriesInfo">DOI 10.17487/RFC4121</span>, <time datetime="2005-07" class="refDate">July 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4121">https://www.rfc-editor.org/rfc/rfc4121</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC5531">[RFC5531]</dt>
-        <dd>
-<span class="refAuthor">Thurlow, R.</span>, <span class="refTitle">"RPC: Remote Procedure Call Protocol Specification Version 2"</span>, <span class="seriesInfo">RFC 5531</span>, <span class="seriesInfo">DOI 10.17487/RFC5531</span>, <time datetime="2009-05" class="refDate">May 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5531">https://www.rfc-editor.org/rfc/rfc5531</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5912">[RFC5912]</dt>
         <dd>
 <span class="refAuthor">Hoffman, P.</span> and <span class="refAuthor">J. Schaad</span>, <span class="refTitle">"New ASN.1 Modules for the Public Key Infrastructure Using X.509 (PKIX)"</span>, <span class="seriesInfo">RFC 5912</span>, <span class="seriesInfo">DOI 10.17487/RFC5912</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5912">https://www.rfc-editor.org/rfc/rfc5912</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8881">[RFC8881]</dt>
+<dt id="RFC7942">[RFC7942]</dt>
       <dd>
-<span class="refAuthor">Noveck, D., Ed.</span> and <span class="refAuthor">C. Lever</span>, <span class="refTitle">"Network File System (NFS) Version 4 Minor Version 1 Protocol"</span>, <span class="seriesInfo">RFC 8881</span>, <span class="seriesInfo">DOI 10.17487/RFC8881</span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8881">https://www.rfc-editor.org/rfc/rfc8881</a>&gt;</span>. </dd>
+<span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2305,9 +2287,7 @@ SubjectAltName ::= SEQUENCE {
     otherName [0] IMPLICIT SEQUENCE {
         type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
         value [0] EXPLICIT NFSv4Principal ::= {
-            user "alice",
-            atSign "@",
-            domain "nfs.example.com"
+            principal "alice@nfs.example.com"
         }
     }
 }
@@ -2316,9 +2296,9 @@ SubjectAltName ::= SEQUENCE {
 <p id="appendix-B.1-3">DER encoding (hexadecimal):<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-B.1-4">
 <pre>
-30 2B A0 29 06 08 2B 06 01 05 05 07 08 XX A0 1D
-0C 05 61 6C 69 63 65 13 01 40 0C 0F 6E 66 73 2E
-65 78 61 6D 70 6C 65 2E 63 6F 6D
+30 27 A0 25 06 08 2B 06 01 05 05 07 08 XX A0 19
+30 17 0C 15 61 6C 69 63 65 40 6E 66 73 2E 65 78
+61 6D 70 6C 65 2E 63 6F 6D
 </pre><a href="#appendix-B.1-4" class="pilcrow">¶</a>
 </div>
 <p id="appendix-B.1-5">Note: XX represents the TBD value for id-on-nfsv4Principal.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
@@ -2440,9 +2420,7 @@ SubjectAltName ::= SEQUENCE {
     otherName [0] IMPLICIT SEQUENCE {
         type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
         value [0] EXPLICIT NFSv4Principal ::= {
-            user "用户",        -- Chinese characters for "user"
-            atSign "@",
-            domain "例え.jp"    -- Japanese IDN
+            principal "用户@例え.jp"    -- UTF-8 encoded user@domain
         }
     }
 }
@@ -2451,9 +2429,9 @@ SubjectAltName ::= SEQUENCE {
 <p id="appendix-B.5-3">DER encoding (hexadecimal):<a href="#appendix-B.5-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-B.5-4">
 <pre>
-30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
-0C 06 E7 94 A8 E6 88 B7 13 01 40 0C 0C E4 BE 8B
-E3 81 88 2E 6A 70
+30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
+30 12 0C 10 E7 94 A8 E6 88 B7 40 E4 BE 8B E3 81
+88 2E 6A 70
 </pre><a href="#appendix-B.5-4" class="pilcrow">¶</a>
 </div>
 <p id="appendix-B.5-5">Note: The UTF-8 encoding of the Chinese characters "用户" is
@@ -2477,37 +2455,30 @@ and expected DER encoding.<a href="#appendix-B.6-1" class="pilcrow">¶</a></p>
 <p id="appendix-B.6.1-2">Input:<a href="#appendix-B.6.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B.6.1-3.1">
-              <p id="appendix-B.6.1-3.1.1">user: "bob"<a href="#appendix-B.6.1-3.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="appendix-B.6.1-3.2">
-              <p id="appendix-B.6.1-3.2.1">domain: "example.org"<a href="#appendix-B.6.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="appendix-B.6.1-3.1.1">principal: "bob@example.org"<a href="#appendix-B.6.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="appendix-B.6.1-4">Expected DER encoding:<a href="#appendix-B.6.1-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-B.6.1-5">
 <pre>
-30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
-0C 03 62 6F 62 13 01 40 0C 0B 65 78 61 6D 70 6C
-65 2E 6F 72 67
+30 21 A0 1F 06 08 2B 06 01 05 05 07 08 XX A0 13
+30 11 0C 0F 62 6F 62 40 65 78 61 6D 70 6C 65 2E
+6F 72 67
 </pre><a href="#appendix-B.6.1-5" class="pilcrow">¶</a>
 </div>
 <p id="appendix-B.6.1-6">Test Case 2: User with numbers and domain with subdomain<a href="#appendix-B.6.1-6" class="pilcrow">¶</a></p>
 <p id="appendix-B.6.1-7">Input:<a href="#appendix-B.6.1-7" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B.6.1-8.1">
-              <p id="appendix-B.6.1-8.1.1">user: "user123"<a href="#appendix-B.6.1-8.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="appendix-B.6.1-8.2">
-              <p id="appendix-B.6.1-8.2.1">domain: "nfs.lab.example.com"<a href="#appendix-B.6.1-8.2.1" class="pilcrow">¶</a></p>
+              <p id="appendix-B.6.1-8.1.1">principal: "user123@nfs.lab.example.com"<a href="#appendix-B.6.1-8.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="appendix-B.6.1-9">Expected DER encoding:<a href="#appendix-B.6.1-9" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-B.6.1-10">
 <pre>
-30 2F A0 2D 06 08 2B 06 01 05 05 07 08 XX A0 21
-0C 07 75 73 65 72 31 32 33 13 01 40 0C 14 6E 66
-73 2E 6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F
-6D
+30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
+30 1D 0C 1B 75 73 65 72 31 32 33 40 6E 66 73 2E
+6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F 6D
 </pre><a href="#appendix-B.6.1-10" class="pilcrow">¶</a>
 </div>
 </section>
@@ -2577,20 +2548,14 @@ and expected DER encoding.<a href="#appendix-B.6-1" class="pilcrow">¶</a></p>
 <a href="#appendix-B.6.3" class="section-number selfRef">B.6.3. </a><a href="#name-invalid-test-cases" class="section-name selfRef">Invalid Test Cases</a>
           </h4>
 <p id="appendix-B.6.3-1">These test cases should be rejected by conforming implementations:<a href="#appendix-B.6.3-1" class="pilcrow">¶</a></p>
-<p id="appendix-B.6.3-2">Test Case 1: NFSv4Principal with missing atSign field<a href="#appendix-B.6.3-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.6.3-2">Test Case 1: NFSv4Principal with missing '@' separator<a href="#appendix-B.6.3-2" class="pilcrow">¶</a></p>
 <p id="appendix-B.6.3-3">Input (malformed):<a href="#appendix-B.6.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B.6.3-4.1">
-              <p id="appendix-B.6.3-4.1.1">user: "alice"<a href="#appendix-B.6.3-4.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="appendix-B.6.3-4.2">
-              <p id="appendix-B.6.3-4.2.1">atSign: "" (empty)<a href="#appendix-B.6.3-4.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="appendix-B.6.3-4.3">
-              <p id="appendix-B.6.3-4.3.1">domain: "example.com"<a href="#appendix-B.6.3-4.3.1" class="pilcrow">¶</a></p>
+              <p id="appendix-B.6.3-4.1.1">principal: "aliceexample.com" (no '@' character present)<a href="#appendix-B.6.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="appendix-B.6.3-5">Expected result: Parsing failure<a href="#appendix-B.6.3-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.6.3-5">Expected result: Rejection by server (invalid principal string format)<a href="#appendix-B.6.3-5" class="pilcrow">¶</a></p>
 <p id="appendix-B.6.3-6">Test Case 2: RPCAuthSys with UID exceeding 32-bit range<a href="#appendix-B.6.3-6" class="pilcrow">¶</a></p>
 <p id="appendix-B.6.3-7">Input (malformed):<a href="#appendix-B.6.3-7" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2654,11 +2619,10 @@ for their guidance and oversight.<a href="#appendix-C-2" class="pilcrow">¶</a><
 </address>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Chuck Lever (<span class="role">editor</span>)</span></div>
-<div dir="auto" class="left"><span class="org">Oracle Corporation</span></div>
 <div dir="auto" class="left"><span class="country-name">United States of America</span></div>
 <div class="email">
 <span>Email:</span>
-<a href="mailto:chuck.lever@oracle.com" class="email">chuck.lever@oracle.com</a>
+<a href="mailto:cel-ietf@chucklever.net" class="email">cel-ietf@chucklever.net</a>
 </div>
 </address>
 </section>
