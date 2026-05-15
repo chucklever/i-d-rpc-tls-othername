@@ -639,9 +639,7 @@ SubjectAltName ::= SEQUENCE {
     otherName [0] IMPLICIT SEQUENCE {
         type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
         value [0] EXPLICIT NFSv4Principal ::= {
-            user "alice",
-            atSign "@",
-            domain "nfs.example.com"
+            principal "alice@nfs.example.com"
         }
     }
 }
@@ -650,9 +648,9 @@ SubjectAltName ::= SEQUENCE {
 DER encoding (hexadecimal):
 
 ~~~
-30 2B A0 29 06 08 2B 06 01 05 05 07 08 XX A0 1D
-0C 05 61 6C 69 63 65 13 01 40 0C 0F 6E 66 73 2E
-65 78 61 6D 70 6C 65 2E 63 6F 6D
+30 27 A0 25 06 08 2B 06 01 05 05 07 08 XX A0 19
+30 17 0C 15 61 6C 69 63 65 40 6E 66 73 2E 65 78
+61 6D 70 6C 65 2E 63 6F 6D
 ~~~
 
 Note: XX represents the TBD value for id-on-nfsv4Principal.
@@ -760,9 +758,7 @@ SubjectAltName ::= SEQUENCE {
     otherName [0] IMPLICIT SEQUENCE {
         type-id OBJECT IDENTIFIER ::= id-on-nfsv4Principal,
         value [0] EXPLICIT NFSv4Principal ::= {
-            user "用户",        -- Chinese characters for "user"
-            atSign "@",
-            domain "例え.jp"    -- Japanese IDN
+            principal "用户@例え.jp"    -- UTF-8 encoded user@domain
         }
     }
 }
@@ -771,9 +767,9 @@ SubjectAltName ::= SEQUENCE {
 DER encoding (hexadecimal):
 
 ~~~
-30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
-0C 06 E7 94 A8 E6 88 B7 13 01 40 0C 0C E4 BE 8B
-E3 81 88 2E 6A 70
+30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
+30 12 0C 10 E7 94 A8 E6 88 B7 40 E4 BE 8B E3 81
+88 2E 6A 70
 ~~~
 
 Note: The UTF-8 encoding of the Chinese characters "用户" is
@@ -791,31 +787,28 @@ Test Case 1: Simple ASCII user and domain
 
 Input:
 
-- user: "bob"
-- domain: "example.org"
+- principal: "bob@example.org"
 
 Expected DER encoding:
 
 ~~~
-30 22 A0 20 06 08 2B 06 01 05 05 07 08 XX A0 14
-0C 03 62 6F 62 13 01 40 0C 0B 65 78 61 6D 70 6C
-65 2E 6F 72 67
+30 21 A0 1F 06 08 2B 06 01 05 05 07 08 XX A0 13
+30 11 0C 0F 62 6F 62 40 65 78 61 6D 70 6C 65 2E
+6F 72 67
 ~~~
 
 Test Case 2: User with numbers and domain with subdomain
 
 Input:
 
-- user: "user123"
-- domain: "nfs.lab.example.com"
+- principal: "user123@nfs.lab.example.com"
 
 Expected DER encoding:
 
 ~~~
-30 2F A0 2D 06 08 2B 06 01 05 05 07 08 XX A0 21
-0C 07 75 73 65 72 31 32 33 13 01 40 0C 14 6E 66
-73 2E 6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F
-6D
+30 2D A0 2B 06 08 2B 06 01 05 05 07 08 XX A0 1F
+30 1D 0C 1B 75 73 65 72 31 32 33 40 6E 66 73 2E
+6C 61 62 2E 65 78 61 6D 70 6C 65 2E 63 6F 6D
 ~~~
 
 ### Valid RPCAuthSys Test Cases
@@ -867,15 +860,13 @@ Expected DER encoding:
 
 These test cases should be rejected by conforming implementations:
 
-Test Case 1: NFSv4Principal with missing atSign field
+Test Case 1: NFSv4Principal with missing '@' separator
 
 Input (malformed):
 
-- user: "alice"
-- atSign: "" (empty)
-- domain: "example.com"
+- principal: "aliceexample.com" (no '@' character present)
 
-Expected result: Parsing failure
+Expected result: Rejection by server (invalid principal string format)
 
 Test Case 2: RPCAuthSys with UID exceeding 32-bit range
 
