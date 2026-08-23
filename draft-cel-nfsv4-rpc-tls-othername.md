@@ -230,6 +230,22 @@ by the client and is not verified, so the attacker replaces the
 identity named in the certificate with whatever identity the client
 sends.
 
+A client MUST NOT present a certificate carrying one of the otherName
+fields defined in this document on a TLS session over which it
+transmits RPC requests for more than one RPC user. A client that
+multiplexes RPC users onto one session can still use this mechanism by
+opening a separate TLS session, authenticated with such a certificate,
+for the user that certificate names.
+
+{{Section 6.2 of RFC9289}} observes that a client's TLS credentials
+are potentially visible to every RPC user that shares a TLS session.
+Under {{RFC9289}} alone, a local user who reaches the shared
+credential still faces the server's per-user authorization. A server
+that applies identity squashing discards the credential carried in the
+RPC header. Reaching the session is then the whole of the
+authorization, and every request on it is attributed to the identity
+named in the certificate.
+
 ## AUTH_SYS Identities
 
 ### otherName OID for AUTH_SYS
