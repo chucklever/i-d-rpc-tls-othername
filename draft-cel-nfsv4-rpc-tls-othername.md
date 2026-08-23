@@ -154,6 +154,16 @@ The server performs identity squashing only if it successfully validates
 an identity squashing otherName field and authorizes its use for the
 authenticated TLS peer.
 
+If the server recognizes an identity squashing type-id but cannot
+validate the identity that otherName carries, or does not authorize
+its use for the authenticated TLS peer, the server MUST reject every
+non-NULL procedure on that TLS session with a reply_stat of
+MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
+AUTH_TOOWEAK, as defined in {{Section 9 of !RFC5531}}. The server MUST
+NOT fall back to the credential carried in the RPC header. Such a
+fallback would grant the client the access its header credential
+asserts, which is the access the certificate was meant to withhold.
+
 ## Server Processing
 
 This section provides a non-normative example of how an RPC server
@@ -195,14 +205,24 @@ and access control decisions.
 Parsing and validating the certificate once at TLS session establishment
 and caching the result avoids per-request overhead.
 
-## Interoperability with Non-Supporting Servers
+## Interoperability with Non-Supporting Servers {#sec-interop}
 
 RPC servers that do not implement this specification will not recognize
-the otherName OIDs defined in this document. Such servers MUST ignore
-unrecognized otherName entries per {{Section 4.2.1.6 of RFC5280}}.
-These servers will process RPC requests using the credential information
-contained in the RPC header, subject to their normal authentication and
-authorization policies.
+the otherName OIDs defined in this document. {{Section 4.2 of RFC5280}}
+requires a certificate-using system to reject a certificate that carries
+an unrecognized critical extension, and permits it to ignore an
+unrecognized non-critical one. Neither rule reaches an unrecognized
+type-id within a subjectAltName extension, which {{Section 4.2 of
+RFC5280}} lists among the extensions that a conforming application
+recognizes.
+
+This document cannot impose a requirement on servers that do not
+implement it. Such servers are expected to ignore otherName entries
+whose type-id they do not recognize, and to process RPC requests using
+the credential information contained in the RPC header, subject to
+their normal authentication and authorization policies. That
+expectation is convention rather than a requirement inherited from
+{{RFC5280}}.
 
 Issuing a certificate that carries one of the otherName fields defined
 in this document does not by itself restrict the access available to
@@ -211,6 +231,24 @@ that implement this specification. {{sec-security-considerations}}
 recommends that servers maintain trust anchors for identity squashing
 certificates separate from those used solely for TLS peer
 authentication.
+
+## Certificate Profile
+
+A certificate carrying one of the otherName fields defined in this
+document MUST contain a non-empty subject distinguished name, and its
+subjectAltName extension MUST NOT be marked critical.
+
+{{Section 4.2.1.6 of RFC5280}} requires a critical subjectAltName
+extension when the subject field contains an empty sequence. A server
+that does not implement this specification and encounters a critical
+subjectAltName carrying only an unrecognized type-id may reject the
+certificate, because {{Section 4.2 of RFC5280}} directs a
+certificate-using system to reject a critical extension that contains
+information it cannot process. {{RFC5280}} does not settle whether an
+unrecognized type-id within a recognized extension is such
+information. A non-empty subject distinguished name keeps the
+subjectAltName extension non-critical, which removes the rejection
+outcome and leaves the fall-through described in {{sec-interop}}.
 
 ## Client Requirements
 
