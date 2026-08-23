@@ -204,6 +204,32 @@ These servers will process RPC requests using the credential information
 contained in the RPC header, subject to their normal authentication and
 authorization policies.
 
+Issuing a certificate that carries one of the otherName fields defined
+in this document does not by itself restrict the access available to
+the certificate holder. The restriction takes effect only on servers
+that implement this specification. {{sec-security-considerations}}
+recommends that servers maintain trust anchors for identity squashing
+certificates separate from those used solely for TLS peer
+authentication.
+
+## Client Requirements
+
+A client that presents a certificate carrying one of the otherName
+fields defined in this document MUST use a security policy that
+requires a TLS session on every connection to the RPC server, as
+described in {{Section 6.1.1 of RFC9289}}. If the AUTH_TLS probe does
+not elicit a "STARTTLS" token, or if the subsequent TLS handshake
+fails, the client MUST NOT continue RPC operation on that connection.
+
+The AUTH_TLS probe occurs in cleartext. Without such a policy, an
+on-path attacker can alter the probe to make it appear that the server
+does not support TLS. RPC operation then continues with no certificate
+presented, and the server applies its normal policy to the credential
+carried in each RPC header. For AUTH_SYS that credential is asserted
+by the client and is not verified, so the attacker replaces the
+identity named in the certificate with whatever identity the client
+sends.
+
 ## AUTH_SYS Identities
 
 ### otherName OID for AUTH_SYS
@@ -403,6 +429,27 @@ For example, a server might maintain an access control list mapping certificate
 subjects or distinguished names to the set of user identities they are permitted
 to assume. Only if such authorization succeeds should the server execute RPC
 operations under the specified identity.
+
+### Absence of Enforcement
+
+An RPC server that does not implement this specification, or that
+implements it but does not authorize the identity named in the
+certificate, processes RPC requests using the credential carried in
+each RPC header. For AUTH_SYS that credential is asserted by the
+client and is not verified.
+
+Identity squashing therefore fails toward greater privilege. An
+administrator who issues these certificates expecting access to be
+confined to one identity gets no such confinement from a server that
+does not enforce it, and the client cannot tell whether the server
+applied the certificate identity. Other identity policies that an RPC
+server applies without announcing them, such as mapping UID 0 to an
+unprivileged identity or deriving the group list from the server's own
+user database, fail toward lesser privilege instead.
+
+A deployment cannot rely on the presence of these otherName fields as
+an access restriction. The restriction exists only where the server
+enforces it.
 
 ### Name Canonicalization
 
