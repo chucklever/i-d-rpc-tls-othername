@@ -5,7 +5,7 @@
 Network File System Version 4                                 R. Macklem
 Internet-Draft                                                   FreeBSD
 Intended status: Standards Track                           C. Lever, Ed.
-Expires: 16 November 2026                                    15 May 2026
+Expires: 8 March 2027                                   4 September 2026
 
 
  Remote Procedure Call Identity Squashing via x.509 Certificate Fields
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 November 2026.
+   This Internet-Draft will expire on 8 March 2027.
 
 Copyright Notice
 
@@ -77,15 +77,17 @@ Table of Contents
      3.1.  Server Processing of otherName Fields
      3.2.  Server Processing
      3.3.  Interoperability with Non-Supporting Servers
-     3.4.  AUTH_SYS Identities
-       3.4.1.  otherName OID for AUTH_SYS
-       3.4.2.  Format of the otherName Value
-     3.5.  GSS-API Principals
-       3.5.1.  otherName OID for GSS-API Principals
-       3.5.2.  Format of the otherName Value
-     3.6.  NFSv4 User @ Domain String Identities
-       3.6.1.  otherName OID for String Identities
+     3.4.  Certificate Profile
+     3.5.  Client Requirements
+     3.6.  AUTH_SYS Identities
+       3.6.1.  otherName OID for AUTH_SYS
        3.6.2.  Format of the otherName Value
+     3.7.  GSS-API Principals
+       3.7.1.  otherName OID for GSS-API Principals
+       3.7.2.  Format of the otherName Value
+     3.8.  NFSv4 User @ Domain String Identities
+       3.8.1.  otherName OID for String Identities
+       3.8.2.  Format of the otherName Value
    4.  Extending This Mechanism
    5.  Client Certificate Generation
      5.1.  Choosing an Identity Format
@@ -98,7 +100,8 @@ Table of Contents
      7.2.  Identity Squashing and Authorization
        7.2.1.  Trust in the Certificate Authority
        7.2.2.  Authorization Decisions
-       7.2.3.  Name Canonicalization
+       7.2.3.  Absence of Enforcement
+       7.2.4.  Name Canonicalization
      7.3.  Session Binding
      7.4.  Revocation
      7.5.  Privacy Considerations
@@ -238,6 +241,16 @@ Table of Contents
    validates an identity squashing otherName field and authorizes its
    use for the authenticated TLS peer.
 
+   If the server recognizes an identity squashing type-id but cannot
+   validate the identity that otherName carries, or does not authorize
+   its use for the authenticated TLS peer, the server MUST reject every
+   non-NULL procedure on that TLS session with a reply_stat of
+   MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
+   AUTH_TOOWEAK, as defined in Section 9 of [RFC5531].  The server MUST
+   NOT fall back to the credential carried in the RPC header.  Such a
+   fallback would grant the client the access its header credential
+   asserts, which is the access the certificate was meant to withhold.
+
 3.2.  Server Processing
 
    This section provides a non-normative example of how an RPC server
@@ -291,20 +304,90 @@ Table of Contents
 3.3.  Interoperability with Non-Supporting Servers
 
    RPC servers that do not implement this specification will not
-   recognize the otherName OIDs defined in this document.  Such servers
-   MUST ignore unrecognized otherName entries per Section 4.2.1.6 of
-   [RFC5280].  These servers will process RPC requests using the
-   credential information contained in the RPC header, subject to their
-   normal authentication and authorization policies.
+   recognize the otherName OIDs defined in this document.  Section 4.2
+   of [RFC5280] requires a certificate-using system to reject a
+   certificate that carries an unrecognized critical extension, and
+   permits it to ignore an unrecognized non-critical one.  Neither rule
+   reaches an unrecognized type-id within a subjectAltName extension,
+   which Section 4.2 of [RFC5280] lists among the extensions that a
+   conforming application recognizes.
 
-3.4.  AUTH_SYS Identities
+   This document cannot impose a requirement on servers that do not
+   implement it.  Such servers are expected to ignore otherName entries
+   whose type-id they do not recognize, and to process RPC requests
+   using the credential information contained in the RPC header, subject
+   to their normal authentication and authorization policies.  That
+   expectation is convention rather than a requirement inherited from
+   [RFC5280].
 
-3.4.1.  otherName OID for AUTH_SYS
+   Issuing a certificate that carries one of the otherName fields
+   defined in this document does not by itself restrict the access
+   available to the certificate holder.  The restriction takes effect
+   only on servers that implement this specification.  Section 7
+   recommends that servers maintain trust anchors for identity squashing
+   certificates separate from those used solely for TLS peer
+   authentication.
+
+3.4.  Certificate Profile
+
+   A certificate carrying one of the otherName fields defined in this
+   document MUST contain a non-empty subject distinguished name, and its
+   subjectAltName extension MUST NOT be marked critical.
+
+   Section 4.2.1.6 of [RFC5280] requires a critical subjectAltName
+   extension when the subject field contains an empty sequence.  A
+   server that does not implement this specification and encounters a
+   critical subjectAltName carrying only an unrecognized type-id may
+   reject the certificate, because Section 4.2 of [RFC5280] directs a
+   certificate-using system to reject a critical extension that contains
+   information it cannot process.  [RFC5280] does not settle whether an
+   unrecognized type-id within a recognized extension is such
+   information.  A non-empty subject distinguished name keeps the
+   subjectAltName extension non-critical, which removes the rejection
+   outcome and leaves the fall-through described in Section 3.3.
+
+3.5.  Client Requirements
+
+   A client that presents a certificate carrying one of the otherName
+   fields defined in this document MUST use a security policy that
+   requires a TLS session on every connection to the RPC server, as
+   described in Section 6.1.1 of [RFC9289].  If the AUTH_TLS probe does
+   not elicit a "STARTTLS" token, or if the subsequent TLS handshake
+   fails, the client MUST NOT continue RPC operation on that connection.
+
+   The AUTH_TLS probe occurs in cleartext.  Without such a policy, an
+   on-path attacker can alter the probe to make it appear that the
+   server does not support TLS.  RPC operation then continues with no
+   certificate presented, and the server applies its normal policy to
+   the credential carried in each RPC header.  For AUTH_SYS that
+   credential is asserted by the client and is not verified, so the
+   attacker replaces the identity named in the certificate with whatever
+   identity the client sends.
+
+   A client MUST NOT present a certificate carrying one of the otherName
+   fields defined in this document on a TLS session over which it
+   transmits RPC requests for more than one RPC user.  A client that
+   multiplexes RPC users onto one session can still use this mechanism
+   by opening a separate TLS session, authenticated with such a
+   certificate, for the user that certificate names.
+
+   Section 6.2 of [RFC9289] observes that a client's TLS credentials are
+   potentially visible to every RPC user that shares a TLS session.
+   Under [RFC9289] alone, a local user who reaches the shared credential
+   still faces the server's per-user authorization.  A server that
+   applies identity squashing discards the credential carried in the RPC
+   header.  Reaching the session is then the whole of the authorization,
+   and every request on it is attributed to the identity named in the
+   certificate.
+
+3.6.  AUTH_SYS Identities
+
+3.6.1.  otherName OID for AUTH_SYS
 
    The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
    defined in Appendix A.
 
-3.4.2.  Format of the otherName Value
+3.6.2.  Format of the otherName Value
 
    The otherName value for AUTH_SYS identities contains an RPCAuthSys
    structure as defined in Appendix A.  This structure consists of a
@@ -313,28 +396,28 @@ Table of Contents
 
    The use of these integers is further explained in [RFC5531].
 
-3.5.  GSS-API Principals
+3.7.  GSS-API Principals
 
-3.5.1.  otherName OID for GSS-API Principals
+3.7.1.  otherName OID for GSS-API Principals
 
    The otherName OID for GSS-API exported names is id-on-
    gssExportedName, defined in Appendix A.
 
-3.5.2.  Format of the otherName Value
+3.7.2.  Format of the otherName Value
 
    The otherName value contains a GSSExportedName structure as defined
    in Appendix A, consisting of a GSS-API mechanism OID and a mechanism-
    specific exported name value as described in Section 3.2 of
    [RFC2743].
 
-3.6.  NFSv4 User @ Domain String Identities
+3.8.  NFSv4 User @ Domain String Identities
 
-3.6.1.  otherName OID for String Identities
+3.8.1.  otherName OID for String Identities
 
    The otherName OID for NFSv4 user@domain principals is id-on-
    nfsv4Principal, defined in Appendix A.
 
-3.6.2.  Format of the otherName Value
+3.8.2.  Format of the otherName Value
 
    The otherName value contains an NFSv4Principal structure as defined
    in Appendix A, consisting of a UTF-8 encoded user name, the literal
@@ -499,9 +582,30 @@ Table of Contents
    succeeds should the server execute RPC operations under the specified
    identity.
 
-7.2.3.  Name Canonicalization
+7.2.3.  Absence of Enforcement
 
-7.2.3.1.  NFSv4 Principals
+   An RPC server that does not implement this specification, or that
+   implements it but does not authorize the identity named in the
+   certificate, processes RPC requests using the credential carried in
+   each RPC header.  For AUTH_SYS that credential is asserted by the
+   client and is not verified.
+
+   Identity squashing therefore fails toward greater privilege.  An
+   administrator who issues these certificates expecting access to be
+   confined to one identity gets no such confinement from a server that
+   does not enforce it, and the client cannot tell whether the server
+   applied the certificate identity.  Other identity policies that an
+   RPC server applies without announcing them, such as mapping UID 0 to
+   an unprivileged identity or deriving the group list from the server's
+   own user database, fail toward lesser privilege instead.
+
+   A deployment cannot rely on the presence of these otherName fields as
+   an access restriction.  The restriction exists only where the server
+   enforces it.
+
+7.2.4.  Name Canonicalization
+
+7.2.4.1.  NFSv4 Principals
 
    When processing NFSv4Principal otherName values, servers MUST apply
    the same name canonicalization and domain validation procedures
@@ -514,7 +618,7 @@ Table of Contents
    *  Case-sensitivity rules for usernames and domains MUST be
       consistently applied
 
-7.2.3.2.  GSS-API Exported Names
+7.2.4.2.  GSS-API Exported Names
 
    When processing GSSExportedName otherName values, servers MUST verify
    that:
@@ -532,7 +636,7 @@ Table of Contents
    do not fully support, as improper name handling could lead to
    authorization bypass vulnerabilities.
 
-7.2.3.3.  AUTH_SYS Credentials
+7.2.4.3.  AUTH_SYS Credentials
 
    When processing RPCAuthSys otherName values, servers MUST:
 

@@ -12,7 +12,7 @@
 certificate may carry instructions to the RPC server to execute all
 RPC transactions from that client as a single user identity. 
     " name="description">
-<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="x.509" name="keyword">
 <meta content="SubjectAltName" name="keyword">
 <meta content="otherName" name="keyword">
@@ -20,18 +20,19 @@ RPC transactions from that client as a single user identity.
 <meta content="SunRPC" name="keyword">
 <meta content="draft-cel-nfsv4-rpc-tls-othername-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.33.0
-    Python 3.12.13
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.7
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.11.7
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.7.0
+    wcwidth 0.8.3
 -->
 <link href="draft-cel-nfsv4-rpc-tls-othername.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -67,7 +68,6 @@ RPC transactions from that client as a single user identity.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -116,7 +116,6 @@ RPC transactions from that client as a single user identity.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -181,7 +180,6 @@ RPC transactions from that client as a single user identity.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -298,16 +296,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -327,10 +328,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -341,59 +342,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -431,26 +432,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -466,20 +466,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -515,9 +517,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -527,17 +529,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -587,25 +591,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -625,13 +621,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -642,18 +631,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow, a.pilcrow:focus {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -712,9 +699,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -804,23 +791,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -831,19 +822,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -864,54 +857,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -930,26 +923,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -965,12 +958,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1032,17 +1026,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1052,11 +1048,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SunRPC x.509 Identity Squashing</td>
-<td class="right">May 2026</td>
+<td class="right">September 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Macklem &amp; Lever</td>
-<td class="center">Expires 16 November 2026</td>
+<td class="center">Expires 8 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1065,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-cel-nfsv4-rpc-tls-othername-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-05-15" class="published">15 May 2026</time>
+<time datetime="2026-09-04" class="published">4 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-11-16">16 November 2026</time></dd>
+<dd class="expires"><time datetime="2027-03-08">8 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1130,7 +1126,7 @@ RPC transactions from that client as a single user identity.<a href="#section-ab
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 16 November 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1189,35 +1185,41 @@ RPC transactions from that client as a single user identity.<a href="#section-ab
                 <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-interoperability-with-non-s" class="internal xref">Interoperability with Non-Supporting Servers</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-auth_sys-identities" class="internal xref">AUTH_SYS Identities</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.1">
-                    <p id="section-toc.1-1.3.2.4.2.1.1"><a href="#section-3.4.1" class="auto internal xref">3.4.1</a>.  <a href="#name-othername-oid-for-auth_sys" class="internal xref">otherName OID for AUTH_SYS</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4.2.2">
-                    <p id="section-toc.1-1.3.2.4.2.2.1"><a href="#section-3.4.2" class="auto internal xref">3.4.2</a>.  <a href="#name-format-of-the-othername-val" class="internal xref">Format of the otherName Value</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-certificate-profile" class="internal xref">Certificate Profile</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
-                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-gss-api-principals" class="internal xref">GSS-API Principals</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.1">
-                    <p id="section-toc.1-1.3.2.5.2.1.1"><a href="#section-3.5.1" class="auto internal xref">3.5.1</a>.  <a href="#name-othername-oid-for-gss-api-p" class="internal xref">otherName OID for GSS-API Principals</a></p>
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-client-requirements" class="internal xref">Client Requirements</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.2">
-                    <p id="section-toc.1-1.3.2.5.2.2.1"><a href="#section-3.5.2" class="auto internal xref">3.5.2</a>.  <a href="#name-format-of-the-othername-valu" class="internal xref">Format of the otherName Value</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-auth_sys-identities" class="internal xref">AUTH_SYS Identities</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.1">
+                    <p id="section-toc.1-1.3.2.6.2.1.1"><a href="#section-3.6.1" class="auto internal xref">3.6.1</a>.  <a href="#name-othername-oid-for-auth_sys" class="internal xref">otherName OID for AUTH_SYS</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.2">
+                    <p id="section-toc.1-1.3.2.6.2.2.1"><a href="#section-3.6.2" class="auto internal xref">3.6.2</a>.  <a href="#name-format-of-the-othername-val" class="internal xref">Format of the otherName Value</a></p>
 </li>
                 </ul>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
-                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-nfsv4-user-domain-string-id" class="internal xref">NFSv4 User @ Domain String Identities</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7">
+                <p id="section-toc.1-1.3.2.7.1"><a href="#section-3.7" class="auto internal xref">3.7</a>.  <a href="#name-gss-api-principals" class="internal xref">GSS-API Principals</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.1">
-                    <p id="section-toc.1-1.3.2.6.2.1.1"><a href="#section-3.6.1" class="auto internal xref">3.6.1</a>.  <a href="#name-othername-oid-for-string-id" class="internal xref">otherName OID for String Identities</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7.2.1">
+                    <p id="section-toc.1-1.3.2.7.2.1.1"><a href="#section-3.7.1" class="auto internal xref">3.7.1</a>.  <a href="#name-othername-oid-for-gss-api-p" class="internal xref">otherName OID for GSS-API Principals</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6.2.2">
-                    <p id="section-toc.1-1.3.2.6.2.2.1"><a href="#section-3.6.2" class="auto internal xref">3.6.2</a>.  <a href="#name-format-of-the-othername-value" class="internal xref">Format of the otherName Value</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.7.2.2">
+                    <p id="section-toc.1-1.3.2.7.2.2.1"><a href="#section-3.7.2" class="auto internal xref">3.7.2</a>.  <a href="#name-format-of-the-othername-valu" class="internal xref">Format of the otherName Value</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.8">
+                <p id="section-toc.1-1.3.2.8.1"><a href="#section-3.8" class="auto internal xref">3.8</a>.  <a href="#name-nfsv4-user-domain-string-id" class="internal xref">NFSv4 User @ Domain String Identities</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.8.2.1">
+                    <p id="section-toc.1-1.3.2.8.2.1.1"><a href="#section-3.8.1" class="auto internal xref">3.8.1</a>.  <a href="#name-othername-oid-for-string-id" class="internal xref">otherName OID for String Identities</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.8.2.2">
+                    <p id="section-toc.1-1.3.2.8.2.2.1"><a href="#section-3.8.2" class="auto internal xref">3.8.2</a>.  <a href="#name-format-of-the-othername-value" class="internal xref">Format of the otherName Value</a></p>
 </li>
                 </ul>
 </li>
@@ -1264,7 +1266,10 @@ RPC transactions from that client as a single user identity.<a href="#section-ab
                     <p id="section-toc.1-1.7.2.2.2.2.1"><a href="#section-7.2.2" class="auto internal xref">7.2.2</a>.  <a href="#name-authorization-decisions" class="internal xref">Authorization Decisions</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.3">
-                    <p id="section-toc.1-1.7.2.2.2.3.1"><a href="#section-7.2.3" class="auto internal xref">7.2.3</a>.  <a href="#name-name-canonicalization" class="internal xref">Name Canonicalization</a></p>
+                    <p id="section-toc.1-1.7.2.2.2.3.1"><a href="#section-7.2.3" class="auto internal xref">7.2.3</a>.  <a href="#name-absence-of-enforcement" class="internal xref">Absence of Enforcement</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.4">
+                    <p id="section-toc.1-1.7.2.2.2.4.1"><a href="#section-7.2.4" class="auto internal xref">7.2.4</a>.  <a href="#name-name-canonicalization" class="internal xref">Name Canonicalization</a></p>
 </li>
                 </ul>
 </li>
@@ -1496,6 +1501,14 @@ processed independently and do not affect identity squashing behavior.<a href="#
 <p id="section-3.1-3">The server performs identity squashing only if it successfully validates
 an identity squashing otherName field and authorizes its use for the
 authenticated TLS peer.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">If the server recognizes an identity squashing type-id but cannot
+validate the identity that otherName carries, or does not authorize
+its use for the authenticated TLS peer, the server <span class="bcp14">MUST</span> reject every
+non-NULL procedure on that TLS session with a reply_stat of
+MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
+AUTH_TOOWEAK, as defined in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-9" class="relref">Section 9</a> of [<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>. The server <span class="bcp14">MUST NOT</span> fall back to the credential carried in the RPC header. Such a
+fallback would grant the client the access its header credential
+asserts, which is the access the certificate was meant to withhold.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="server-processing">
@@ -1560,96 +1573,167 @@ and access control decisions.<a href="#section-3.2-3.7.1" class="pilcrow">¶</a>
 and caching the result avoids per-request overhead.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="interoperability-with-non-supporting-servers">
+<div id="sec-interop">
 <section id="section-3.3">
         <h3 id="name-interoperability-with-non-s">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-interoperability-with-non-s" class="section-name selfRef">Interoperability with Non-Supporting Servers</a>
         </h3>
 <p id="section-3.3-1">RPC servers that do not implement this specification will not recognize
-the otherName OIDs defined in this document. Such servers <span class="bcp14">MUST</span> ignore
-unrecognized otherName entries per <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.6" class="relref">Section 4.2.1.6</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.
-These servers will process RPC requests using the credential information
-contained in the RPC header, subject to their normal authentication and
-authorization policies.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+the otherName OIDs defined in this document. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>
+requires a certificate-using system to reject a certificate that carries
+an unrecognized critical extension, and permits it to ignore an
+unrecognized non-critical one. Neither rule reaches an unrecognized
+type-id within a subjectAltName extension, which <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> lists among the extensions that a conforming application
+recognizes.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">This document cannot impose a requirement on servers that do not
+implement it. Such servers are expected to ignore otherName entries
+whose type-id they do not recognize, and to process RPC requests using
+the credential information contained in the RPC header, subject to
+their normal authentication and authorization policies. That
+expectation is convention rather than a requirement inherited from
+<span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">Issuing a certificate that carries one of the otherName fields defined
+in this document does not by itself restrict the access available to
+the certificate holder. The restriction takes effect only on servers
+that implement this specification. <a href="#sec-security-considerations" class="auto internal xref">Section 7</a>
+recommends that servers maintain trust anchors for identity squashing
+certificates separate from those used solely for TLS peer
+authentication.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="certificate-profile">
+<section id="section-3.4">
+        <h3 id="name-certificate-profile">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-certificate-profile" class="section-name selfRef">Certificate Profile</a>
+        </h3>
+<p id="section-3.4-1">A certificate carrying one of the otherName fields defined in this
+document <span class="bcp14">MUST</span> contain a non-empty subject distinguished name, and its
+subjectAltName extension <span class="bcp14">MUST NOT</span> be marked critical.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2"><span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2.1.6" class="relref">Section 4.2.1.6</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> requires a critical subjectAltName
+extension when the subject field contains an empty sequence. A server
+that does not implement this specification and encounters a critical
+subjectAltName carrying only an unrecognized type-id may reject the
+certificate, because <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> directs a
+certificate-using system to reject a critical extension that contains
+information it cannot process. <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> does not settle whether an
+unrecognized type-id within a recognized extension is such
+information. A non-empty subject distinguished name keeps the
+subjectAltName extension non-critical, which removes the rejection
+outcome and leaves the fall-through described in <a href="#sec-interop" class="auto internal xref">Section 3.3</a>.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-requirements">
+<section id="section-3.5">
+        <h3 id="name-client-requirements">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-client-requirements" class="section-name selfRef">Client Requirements</a>
+        </h3>
+<p id="section-3.5-1">A client that presents a certificate carrying one of the otherName
+fields defined in this document <span class="bcp14">MUST</span> use a security policy that
+requires a TLS session on every connection to the RPC server, as
+described in <span><a href="https://rfc-editor.org/rfc/rfc9289#section-6.1.1" class="relref">Section 6.1.1</a> of [<a href="#RFC9289" class="cite xref">RFC9289</a>]</span>. If the AUTH_TLS probe does
+not elicit a "STARTTLS" token, or if the subsequent TLS handshake
+fails, the client <span class="bcp14">MUST NOT</span> continue RPC operation on that connection.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.5-2">The AUTH_TLS probe occurs in cleartext. Without such a policy, an
+on-path attacker can alter the probe to make it appear that the server
+does not support TLS. RPC operation then continues with no certificate
+presented, and the server applies its normal policy to the credential
+carried in each RPC header. For AUTH_SYS that credential is asserted
+by the client and is not verified, so the attacker replaces the
+identity named in the certificate with whatever identity the client
+sends.<a href="#section-3.5-2" class="pilcrow">¶</a></p>
+<p id="section-3.5-3">A client <span class="bcp14">MUST NOT</span> present a certificate carrying one of the otherName
+fields defined in this document on a TLS session over which it
+transmits RPC requests for more than one RPC user. A client that
+multiplexes RPC users onto one session can still use this mechanism by
+opening a separate TLS session, authenticated with such a certificate,
+for the user that certificate names.<a href="#section-3.5-3" class="pilcrow">¶</a></p>
+<p id="section-3.5-4"><span><a href="https://rfc-editor.org/rfc/rfc9289#section-6.2" class="relref">Section 6.2</a> of [<a href="#RFC9289" class="cite xref">RFC9289</a>]</span> observes that a client's TLS credentials
+are potentially visible to every RPC user that shares a TLS session.
+Under <span>[<a href="#RFC9289" class="cite xref">RFC9289</a>]</span> alone, a local user who reaches the shared
+credential still faces the server's per-user authorization. A server
+that applies identity squashing discards the credential carried in the
+RPC header. Reaching the session is then the whole of the
+authorization, and every request on it is attributed to the identity
+named in the certificate.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authsys-identities">
-<section id="section-3.4">
+<section id="section-3.6">
         <h3 id="name-auth_sys-identities">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-auth_sys-identities" class="section-name selfRef">AUTH_SYS Identities</a>
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-auth_sys-identities" class="section-name selfRef">AUTH_SYS Identities</a>
         </h3>
 <div id="othername-oid-for-authsys">
-<section id="section-3.4.1">
+<section id="section-3.6.1">
           <h4 id="name-othername-oid-for-auth_sys">
-<a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-othername-oid-for-auth_sys" class="section-name selfRef">otherName OID for AUTH_SYS</a>
+<a href="#section-3.6.1" class="section-number selfRef">3.6.1. </a><a href="#name-othername-oid-for-auth_sys" class="section-name selfRef">otherName OID for AUTH_SYS</a>
           </h4>
-<p id="section-3.4.1-1">The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
-defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.6.1-1">The otherName OID for AUTH_SYS identities is id-on-rpcAuthSys,
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value">
-<section id="section-3.4.2">
+<section id="section-3.6.2">
           <h4 id="name-format-of-the-othername-val">
-<a href="#section-3.4.2" class="section-number selfRef">3.4.2. </a><a href="#name-format-of-the-othername-val" class="section-name selfRef">Format of the otherName Value</a>
+<a href="#section-3.6.2" class="section-number selfRef">3.6.2. </a><a href="#name-format-of-the-othername-val" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
-<p id="section-3.4.2-1">The otherName value for AUTH_SYS identities contains an RPCAuthSys
+<p id="section-3.6.2-1">The otherName value for AUTH_SYS identities contains an RPCAuthSys
 structure as defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>. This structure consists
 of a 32-bit unsigned integer specifying a numeric UID, and a sequence
-of 32-bit unsigned integers specifying numeric GIDs.<a href="#section-3.4.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.4.2-2">The use of these integers is further explained in <span>[<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>.<a href="#section-3.4.2-2" class="pilcrow">¶</a></p>
+of 32-bit unsigned integers specifying numeric GIDs.<a href="#section-3.6.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.6.2-2">The use of these integers is further explained in <span>[<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>.<a href="#section-3.6.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="gss-api-principals">
-<section id="section-3.5">
+<section id="section-3.7">
         <h3 id="name-gss-api-principals">
-<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-gss-api-principals" class="section-name selfRef">GSS-API Principals</a>
+<a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-gss-api-principals" class="section-name selfRef">GSS-API Principals</a>
         </h3>
 <div id="othername-oid-for-gss-api-principals">
-<section id="section-3.5.1">
+<section id="section-3.7.1">
           <h4 id="name-othername-oid-for-gss-api-p">
-<a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-othername-oid-for-gss-api-p" class="section-name selfRef">otherName OID for GSS-API Principals</a>
+<a href="#section-3.7.1" class="section-number selfRef">3.7.1. </a><a href="#name-othername-oid-for-gss-api-p" class="section-name selfRef">otherName OID for GSS-API Principals</a>
           </h4>
-<p id="section-3.5.1-1">The otherName OID for GSS-API exported names is id-on-gssExportedName,
-defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.7.1-1">The otherName OID for GSS-API exported names is id-on-gssExportedName,
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.7.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value-1">
-<section id="section-3.5.2">
+<section id="section-3.7.2">
           <h4 id="name-format-of-the-othername-valu">
-<a href="#section-3.5.2" class="section-number selfRef">3.5.2. </a><a href="#name-format-of-the-othername-valu" class="section-name selfRef">Format of the otherName Value</a>
+<a href="#section-3.7.2" class="section-number selfRef">3.7.2. </a><a href="#name-format-of-the-othername-valu" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
-<p id="section-3.5.2-1">The otherName value contains a GSSExportedName structure as defined in
+<p id="section-3.7.2-1">The otherName value contains a GSSExportedName structure as defined in
 <a href="#sec-asn1" class="auto internal xref">Appendix A</a>, consisting of a GSS-API mechanism OID and a
-mechanism-specific exported name value as described in <span><a href="https://rfc-editor.org/rfc/rfc2743#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC2743" class="cite xref">RFC2743</a>]</span>.<a href="#section-3.5.2-1" class="pilcrow">¶</a></p>
+mechanism-specific exported name value as described in <span><a href="https://rfc-editor.org/rfc/rfc2743#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC2743" class="cite xref">RFC2743</a>]</span>.<a href="#section-3.7.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="nfsv4-user-domain-string-identities">
-<section id="section-3.6">
+<section id="section-3.8">
         <h3 id="name-nfsv4-user-domain-string-id">
-<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-nfsv4-user-domain-string-id" class="section-name selfRef">NFSv4 User @ Domain String Identities</a>
+<a href="#section-3.8" class="section-number selfRef">3.8. </a><a href="#name-nfsv4-user-domain-string-id" class="section-name selfRef">NFSv4 User @ Domain String Identities</a>
         </h3>
 <div id="othername-oid-for-string-identities">
-<section id="section-3.6.1">
+<section id="section-3.8.1">
           <h4 id="name-othername-oid-for-string-id">
-<a href="#section-3.6.1" class="section-number selfRef">3.6.1. </a><a href="#name-othername-oid-for-string-id" class="section-name selfRef">otherName OID for String Identities</a>
+<a href="#section-3.8.1" class="section-number selfRef">3.8.1. </a><a href="#name-othername-oid-for-string-id" class="section-name selfRef">otherName OID for String Identities</a>
           </h4>
-<p id="section-3.6.1-1">The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
-defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.6.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.8.1-1">The otherName OID for NFSv4 user@domain principals is id-on-nfsv4Principal,
+defined in <a href="#sec-asn1" class="auto internal xref">Appendix A</a>.<a href="#section-3.8.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="format-of-the-othername-value-2">
-<section id="section-3.6.2">
+<section id="section-3.8.2">
           <h4 id="name-format-of-the-othername-value">
-<a href="#section-3.6.2" class="section-number selfRef">3.6.2. </a><a href="#name-format-of-the-othername-value" class="section-name selfRef">Format of the otherName Value</a>
+<a href="#section-3.8.2" class="section-number selfRef">3.8.2. </a><a href="#name-format-of-the-othername-value" class="section-name selfRef">Format of the otherName Value</a>
           </h4>
-<p id="section-3.6.2-1">The otherName value contains an NFSv4Principal structure as defined in
+<p id="section-3.8.2-1">The otherName value contains an NFSv4Principal structure as defined in
 <a href="#sec-asn1" class="auto internal xref">Appendix A</a>, consisting of a UTF-8 encoded user name, the
 literal "@" character, and a UTF-8 encoded domain name, as described in
-<span><a href="https://rfc-editor.org/rfc/rfc8881#section-5.9" class="relref">Section 5.9</a> of [<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>.<a href="#section-3.6.2-1" class="pilcrow">¶</a></p>
+<span><a href="https://rfc-editor.org/rfc/rfc8881#section-5.9" class="relref">Section 5.9</a> of [<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>.<a href="#section-3.8.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1893,79 +1977,102 @@ to assume. Only if such authorization succeeds should the server execute RPC
 operations under the specified identity.<a href="#section-7.2.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="name-canonicalization">
+<div id="absence-of-enforcement">
 <section id="section-7.2.3">
+          <h4 id="name-absence-of-enforcement">
+<a href="#section-7.2.3" class="section-number selfRef">7.2.3. </a><a href="#name-absence-of-enforcement" class="section-name selfRef">Absence of Enforcement</a>
+          </h4>
+<p id="section-7.2.3-1">An RPC server that does not implement this specification, or that
+implements it but does not authorize the identity named in the
+certificate, processes RPC requests using the credential carried in
+each RPC header. For AUTH_SYS that credential is asserted by the
+client and is not verified.<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-2">Identity squashing therefore fails toward greater privilege. An
+administrator who issues these certificates expecting access to be
+confined to one identity gets no such confinement from a server that
+does not enforce it, and the client cannot tell whether the server
+applied the certificate identity. Other identity policies that an RPC
+server applies without announcing them, such as mapping UID 0 to an
+unprivileged identity or deriving the group list from the server's own
+user database, fail toward lesser privilege instead.<a href="#section-7.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-3">A deployment cannot rely on the presence of these otherName fields as
+an access restriction. The restriction exists only where the server
+enforces it.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="name-canonicalization">
+<section id="section-7.2.4">
           <h4 id="name-name-canonicalization">
-<a href="#section-7.2.3" class="section-number selfRef">7.2.3. </a><a href="#name-name-canonicalization" class="section-name selfRef">Name Canonicalization</a>
+<a href="#section-7.2.4" class="section-number selfRef">7.2.4. </a><a href="#name-name-canonicalization" class="section-name selfRef">Name Canonicalization</a>
           </h4>
 <div id="nfsv4-principals">
-<section id="section-7.2.3.1">
+<section id="section-7.2.4.1">
             <h5 id="name-nfsv4-principals">
-<a href="#section-7.2.3.1" class="section-number selfRef">7.2.3.1. </a><a href="#name-nfsv4-principals" class="section-name selfRef">NFSv4 Principals</a>
+<a href="#section-7.2.4.1" class="section-number selfRef">7.2.4.1. </a><a href="#name-nfsv4-principals" class="section-name selfRef">NFSv4 Principals</a>
             </h5>
-<p id="section-7.2.3.1-1">When processing NFSv4Principal otherName values, servers <span class="bcp14">MUST</span> apply the same
+<p id="section-7.2.4.1-1">When processing NFSv4Principal otherName values, servers <span class="bcp14">MUST</span> apply the same
 name canonicalization and domain validation procedures described in
-<span><a href="https://rfc-editor.org/rfc/rfc8881#section-5.9" class="relref">Section 5.9</a> of [<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>. In particular:<a href="#section-7.2.3.1-1" class="pilcrow">¶</a></p>
+<span><a href="https://rfc-editor.org/rfc/rfc8881#section-5.9" class="relref">Section 5.9</a> of [<a href="#RFC8881" class="cite xref">RFC8881</a>]</span>. In particular:<a href="#section-7.2.4.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2.3.1-2.1">
-                <p id="section-7.2.3.1-2.1.1">Domain names <span class="bcp14">SHOULD</span> be validated against expected domain suffixes<a href="#section-7.2.3.1-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.2.4.1-2.1">
+                <p id="section-7.2.4.1-2.1.1">Domain names <span class="bcp14">SHOULD</span> be validated against expected domain suffixes<a href="#section-7.2.4.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.1-2.2">
-                <p id="section-7.2.3.1-2.2.1">Internationalized domain names <span class="bcp14">MUST</span> be properly normalized<a href="#section-7.2.3.1-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.1-2.2">
+                <p id="section-7.2.4.1-2.2.1">Internationalized domain names <span class="bcp14">MUST</span> be properly normalized<a href="#section-7.2.4.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.1-2.3">
-                <p id="section-7.2.3.1-2.3.1">Case-sensitivity rules for usernames and domains <span class="bcp14">MUST</span> be consistently applied<a href="#section-7.2.3.1-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.1-2.3">
+                <p id="section-7.2.4.1-2.3.1">Case-sensitivity rules for usernames and domains <span class="bcp14">MUST</span> be consistently applied<a href="#section-7.2.4.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </section>
 </div>
 <div id="gss-api-exported-names">
-<section id="section-7.2.3.2">
+<section id="section-7.2.4.2">
             <h5 id="name-gss-api-exported-names">
-<a href="#section-7.2.3.2" class="section-number selfRef">7.2.3.2. </a><a href="#name-gss-api-exported-names" class="section-name selfRef">GSS-API Exported Names</a>
+<a href="#section-7.2.4.2" class="section-number selfRef">7.2.4.2. </a><a href="#name-gss-api-exported-names" class="section-name selfRef">GSS-API Exported Names</a>
             </h5>
-<p id="section-7.2.3.2-1">When processing GSSExportedName otherName values, servers <span class="bcp14">MUST</span> verify that:<a href="#section-7.2.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2.4.2-1">When processing GSSExportedName otherName values, servers <span class="bcp14">MUST</span> verify that:<a href="#section-7.2.4.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2.3.2-2.1">
-                <p id="section-7.2.3.2-2.1.1">The mechanism OID in the nameType field corresponds to a GSS-API mechanism
-the server supports and trusts<a href="#section-7.2.3.2-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.2.4.2-2.1">
+                <p id="section-7.2.4.2-2.1.1">The mechanism OID in the nameType field corresponds to a GSS-API mechanism
+the server supports and trusts<a href="#section-7.2.4.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.2-2.2">
-                <p id="section-7.2.3.2-2.2.1">The nameValue field conforms to the exported name format defined by that
-specific GSS-API mechanism<a href="#section-7.2.3.2-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.2-2.2">
+                <p id="section-7.2.4.2-2.2.1">The nameValue field conforms to the exported name format defined by that
+specific GSS-API mechanism<a href="#section-7.2.4.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.2-2.3">
-                <p id="section-7.2.3.2-2.3.1">The mechanism-specific name validation and canonicalization procedures are
-followed<a href="#section-7.2.3.2-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.2-2.3">
+                <p id="section-7.2.4.2-2.3.1">The mechanism-specific name validation and canonicalization procedures are
+followed<a href="#section-7.2.4.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
-<p id="section-7.2.3.2-3">Servers <span class="bcp14">SHOULD NOT</span> accept exported names from GSS-API mechanisms they do not
+<p id="section-7.2.4.2-3">Servers <span class="bcp14">SHOULD NOT</span> accept exported names from GSS-API mechanisms they do not
 fully support, as improper name handling could lead to authorization bypass
-vulnerabilities.<a href="#section-7.2.3.2-3" class="pilcrow">¶</a></p>
+vulnerabilities.<a href="#section-7.2.4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authsys-credentials">
-<section id="section-7.2.3.3">
+<section id="section-7.2.4.3">
             <h5 id="name-auth_sys-credentials">
-<a href="#section-7.2.3.3" class="section-number selfRef">7.2.3.3. </a><a href="#name-auth_sys-credentials" class="section-name selfRef">AUTH_SYS Credentials</a>
+<a href="#section-7.2.4.3" class="section-number selfRef">7.2.4.3. </a><a href="#name-auth_sys-credentials" class="section-name selfRef">AUTH_SYS Credentials</a>
             </h5>
-<p id="section-7.2.3.3-1">When processing RPCAuthSys otherName values, servers <span class="bcp14">MUST</span>:<a href="#section-7.2.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.2.4.3-1">When processing RPCAuthSys otherName values, servers <span class="bcp14">MUST</span>:<a href="#section-7.2.4.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2.3.3-2.1">
-                <p id="section-7.2.3.3-2.1.1">Validate that the UID and GIDs fall within acceptable ranges for the local
-system's user database<a href="#section-7.2.3.3-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.2.4.3-2.1">
+                <p id="section-7.2.4.3-2.1.1">Validate that the UID and GIDs fall within acceptable ranges for the local
+system's user database<a href="#section-7.2.4.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.3-2.2">
-                <p id="section-7.2.3.3-2.2.1">Verify that the UID corresponds to a valid user account<a href="#section-7.2.3.3-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.3-2.2">
+                <p id="section-7.2.4.3-2.2.1">Verify that the UID corresponds to a valid user account<a href="#section-7.2.4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-7.2.3.3-2.3">
-                <p id="section-7.2.3.3-2.3.1">Confirm that the GIDs represent valid groups and that the user is authorized
-to be a member of those groups<a href="#section-7.2.3.3-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-7.2.4.3-2.3">
+                <p id="section-7.2.4.3-2.3.1">Confirm that the GIDs represent valid groups and that the user is authorized
+to be a member of those groups<a href="#section-7.2.4.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
-<p id="section-7.2.3.3-3">Servers <span class="bcp14">SHOULD</span> reject certificates containing UID 0 (root) or other privileged
+<p id="section-7.2.4.3-3">Servers <span class="bcp14">SHOULD</span> reject certificates containing UID 0 (root) or other privileged
 UIDs unless there is an explicit and well-justified operational requirement,
-and additional strong authorization controls are in place.<a href="#section-7.2.3.3-3" class="pilcrow">¶</a></p>
+and additional strong authorization controls are in place.<a href="#section-7.2.4.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
