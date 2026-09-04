@@ -416,6 +416,16 @@ specify it further. A server whose mapping does not handle the
 domain part of the string can resolve only strings whose domain
 matches its own.
 
+This form carries an identity that belongs to an upper-layer
+protocol rather than to RPC. The RPCAuthSys and GSSExportedName forms
+name identities in terms the RPC layer already uses for its AUTH_SYS
+and RPCSEC_GSS flavors. The user@domain string is the representation
+that NFSv4 defines for its owner and owner_group attributes, and
+resolving it requires the owner mapping of an NFSv4 server. An RPC
+server for another program has no such mapping and cannot apply this
+form. The form is therefore suited to NFSv4 servers, and a deployment
+that spans other RPC services chooses one of the other two.
+
 # Extending This Mechanism
 
 It is possible that in the future, RPC servers might implement other forms
@@ -463,10 +473,12 @@ GSSExportedName
   indicated by the nameType OID.
 
 NFSv4Principal
-: Recommended for heterogeneous environments or when human-readable
-  identities are preferred. The user@domain format is familiar to
-  administrators and supports internationalization, but requires that
-  servers resolve the string through their NFSv4 owner mapping.
+: Suited to NFSv4 servers, which already resolve user@domain strings
+  through their owner mapping, and to deployments where human-readable
+  identities are preferred. The format is familiar to administrators
+  and supports internationalization, but it names an NFSv4 identity
+  rather than an RPC one, so RPC servers for other programs cannot
+  apply it.
 
 ## Populating Identity Fields
 
