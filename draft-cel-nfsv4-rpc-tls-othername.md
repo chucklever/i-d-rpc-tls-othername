@@ -188,6 +188,33 @@ NOT fall back to the credential carried in the RPC header. Such a
 fallback would grant the client the access its header credential
 asserts, which is the access the certificate was meant to withhold.
 
+## Server Policy {#sec-server-policy}
+
+A server that implements this specification either enforces identity
+squashing or has it disabled. The scope at which a server sets that
+policy, whether for the whole server, per export, or per some other
+unit, is a local matter.
+
+A server on which identity squashing is disabled MUST ignore the
+identity squashing otherName entries in a client certificate and
+process RPC requests as a server that does not implement this
+specification does ({{sec-interop}}). A client cannot distinguish the
+two.
+
+A server that enforces identity squashing applies
+{{sec-server-processing}} to every client certificate it receives.
+On a connection for which no certificate identity has been applied,
+the server MUST reject every non-NULL procedure that carries an
+AUTH_NONE or AUTH_SYS credential with a reply_stat of MSG_DENIED, a
+reject_stat of AUTH_ERROR, and an auth_stat of AUTH_TOOWEAK. That
+covers a connection with no TLS session, a TLS session on which the
+client presented no certificate, and a TLS session whose certificate
+carries no identity squashing otherName, in addition to the case
+{{sec-server-processing}} specifies. An enforcing server never
+executes such a request under the credential carried in the RPC
+header. A request that carries an RPCSEC_GSS credential is processed
+under its GSS security context under either policy.
+
 ## Server Processing
 
 This section provides a non-normative example of how an RPC server
@@ -260,7 +287,8 @@ expectation is convention rather than a requirement inherited from
 Issuing a certificate that carries one of the otherName fields defined
 in this document does not by itself restrict the access available to
 the certificate holder. The restriction takes effect only on servers
-that implement this specification. {{sec-security-considerations}}
+that implement this specification and enforce identity squashing
+({{sec-server-policy}}). {{sec-security-considerations}}
 recommends that servers maintain trust anchors for identity squashing
 certificates separate from those used solely for TLS peer
 authentication.
@@ -539,16 +567,22 @@ operations under the specified identity.
 ### Absence of Enforcement
 
 An RPC server that does not implement this specification, or that
-implements it but does not authorize the identity named in the
-certificate, processes RPC requests using the credential carried in
-each RPC header. For AUTH_SYS that credential is asserted by the
-client and is not verified.
+implements it with identity squashing disabled ({{sec-server-policy}}),
+processes RPC requests using the credential carried in each RPC
+header. For AUTH_SYS that credential is asserted by the client and is
+not verified.
 
 Identity squashing therefore fails toward greater privilege. An
 administrator who issues these certificates expecting access to be
 confined to one identity gets no such confinement from a server that
 does not enforce it, and the client cannot tell whether the server
-applied the certificate identity. Other identity policies that an RPC
+applied the certificate identity. A client can confirm that a server
+enforces identity squashing by presenting a certificate that carries
+no identity squashing otherName and observing AUTH_TOOWEAK. A server
+that ignores the otherName gives the client no signal, so a client
+cannot distinguish a server with identity squashing disabled from
+one that does not implement this specification. Other identity
+policies that an RPC
 server applies without announcing them, such as mapping UID 0 to an
 unprivileged identity or deriving the group list from the server's own
 user database, fail toward lesser privilege instead.
