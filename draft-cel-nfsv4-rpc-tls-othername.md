@@ -88,8 +88,8 @@ TGTs expire in hours, yet the service may run for much longer. This
 extension lets the client convey that identity in the certificate,
 which does not expire on the same short cycle as a TGT.
 
-When an RPC server replaces incoming RPC user identities with a single
-user identity, for brevity we refer to this as "identity squashing".
+This document calls the replacement of incoming RPC user identities
+with a single user identity "identity squashing".
 
 ## Summary of Proposed Solution
 
@@ -120,8 +120,8 @@ with type-id values defined in this document. Other SubjectAltName entries
 are used for their normal purposes (such as hostname verification for TLS).
 
 This document specifies new uses of the otherName field to name an
-RPC user identity. The receiving system (an RPC server) derives an
-RPC user from that identity when the TLS session is established. For
+RPC user identity. The RPC server derives an RPC user from that
+identity when the TLS session is established. For
 each RPC request within the TLS session that carries an AUTH_NONE or
 AUTH_SYS credential, the server executes the request under the
 derived RPC user in place of the one the credential asserts.
@@ -179,11 +179,11 @@ authenticated TLS peer.
 If the server recognizes an identity squashing type-id but cannot
 validate the identity that otherName carries, cannot derive an RPC
 user from it, or does not authorize its use for the authenticated
-TLS peer, the server MUST reject every
-non-NULL procedure on that TLS session that carries an AUTH_NONE or
-AUTH_SYS credential with a reply_stat of
-MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
-AUTH_TOOWEAK, as defined in {{Section 9 of !RFC5531}}. The server MUST
+TLS peer, the server MUST reject every non-NULL procedure on that TLS
+session that carries an AUTH_NONE or AUTH_SYS credential with a
+reply_stat of MSG_DENIED, a reject_stat of AUTH_ERROR, and an
+auth_stat of AUTH_TOOWEAK, as defined in {{Section 9 of !RFC5531}}.
+The server MUST
 NOT fall back to the credential carried in the RPC header. Such a
 fallback would grant the client the access its header credential
 asserts, which is the access the certificate was meant to withhold.
@@ -254,20 +254,17 @@ session state.
 
 1. For each incoming RPC request on this TLS session that carries an
 AUTH_NONE or AUTH_SYS credential, execute the request under the RPC user
-derived from the certificate. The credential information in the RPC
-header is ignored. A request
-that carries an RPCSEC_GSS credential is processed under its GSS security
-context, as it would be on any other TLS session.
-
-1. Process the RPC request using the squashed identity for all authorization
-and access control decisions.
+derived from the certificate, for all authorization and access control
+decisions. The credential information in the RPC header is ignored. A
+request that carries an RPCSEC_GSS credential is processed under its GSS
+security context, as it would be on any other TLS session.
 
 Parsing and validating the certificate once at TLS session establishment
 and caching the result avoids per-request overhead.
 
 ## Interoperability with Non-Supporting Servers {#sec-interop}
 
-RPC servers that do not implement this specification will not recognize
+RPC servers that do not implement this specification do not recognize
 the otherName OIDs defined in this document. {{Section 4.2 of RFC5280}}
 requires a certificate-using system to reject a certificate that carries
 an unrecognized critical extension, and permits it to ignore an
@@ -428,18 +425,15 @@ that spans other RPC services chooses one of the other two.
 
 # Extending This Mechanism
 
-It is possible that in the future, RPC servers might implement other forms
-of RPC user identity, such as Windows Security Identifiers.
-This section describes how standards action can extend the mechanism
-specified in this document to accommodate new forms of user identity.
+RPC servers might in future implement other forms of RPC user
+identity, such as Windows Security Identifiers. Standards Action can
+extend the mechanism specified in this document to a new form. A
+document that defines a new identity type:
 
-Documents that extend this mechanism using Standards Action MUST satisfy
-the following requirements:
-
-- New identity types MUST define an ASN.1 module.
-- New identity types MUST request an IANA OID allocation.
-- New identity types SHOULD provide security considerations specific to that identity type.
-- New identity types SHOULD provide examples and test vectors.
+- MUST define an ASN.1 module.
+- MUST request an IANA OID allocation.
+- SHOULD provide security considerations specific to that identity type.
+- SHOULD provide examples and test vectors.
 
 # Client Certificate Generation
 
@@ -460,17 +454,15 @@ RPCAuthSys
 
 GSSExportedName
 : Suitable for servers that key user identities by GSS-API principal
-  name, such as servers already deployed with Kerberos. Because identity
-  squashing applies only to requests that carry an AUTH_NONE or AUTH_SYS
-  credential, this format names the principal under which such requests
-  execute. It does not affect requests that carry an RPCSEC_GSS
-  credential, which prove a principal of their own. One use is a host
-  whose users hold Kerberos principals but which has no keytab of its
-  own: the certificate names a service principal the server already
-  knows, so the host's non-GSS traffic executes as that principal while
-  its users' RPCSEC_GSS traffic continues under their own identities.
-  This format requires that servers support the specific mechanism
-  indicated by the nameType OID.
+  name, such as servers already deployed with Kerberos. Identity
+  squashing applies only to AUTH_NONE and AUTH_SYS requests, so this
+  format names the principal those requests execute under and leaves
+  RPCSEC_GSS requests, which prove a principal of their own, untouched.
+  One use is a host with no keytab whose users hold Kerberos principals:
+  the certificate names a service principal the server already knows, so
+  the host's non-GSS traffic executes as that principal while its users'
+  RPCSEC_GSS traffic keeps their own identities. Servers must support
+  the mechanism indicated by the nameType OID.
 
 NFSv4Principal
 : Suited to NFSv4 servers, which already resolve user@domain strings
@@ -488,10 +480,9 @@ UID/GID values
 : Ensure that the numeric values in RPCAuthSys correspond to valid entries
   in the server's user database. List the effective GID first, followed
   by any supplementary GIDs, or leave gids empty to have the server
-  supply the groups from its own user database. Avoid using privileged
-  UIDs (such as 0 for
-  root) unless there is a specific operational requirement and strong
-  authorization controls are in place.
+  supply the groups from its own user database. Avoid privileged UIDs
+  (such as 0 for root) unless there is a specific operational
+  requirement and strong authorization controls are in place.
 
 GSS-API exported names
 : The nameValue field should contain a properly formatted exported name
@@ -509,9 +500,9 @@ User@domain strings
 
 Certificates containing identity squashing otherName fields grant access
 to server resources under a specific user identity. Administrators should
-consider appropriate validity periods based on their security requirements.
-Shorter validity periods reduce the window of exposure if a certificate is
-compromised, but may increase operational overhead for certificate renewal.
+choose validity periods to suit their security requirements. Shorter
+validity periods reduce the window of exposure if a certificate is
+compromised, but increase the operational overhead of renewal.
 
 Administrators should also factor in how quickly certificate revocation
 (CRL or OCSP) propagates in their environment, since that affects how
@@ -609,16 +600,17 @@ Identity squashing therefore fails toward greater privilege. An
 administrator who issues these certificates expecting access to be
 confined to one identity gets no such confinement from a server that
 does not enforce it, and the client cannot tell whether the server
-applied the certificate identity. A client can confirm that a server
-enforces identity squashing by presenting a certificate that carries
-no identity squashing otherName and observing AUTH_TOOWEAK. A server
-that ignores the otherName gives the client no signal, so a client
-cannot distinguish a server with identity squashing disabled from
-one that does not implement this specification. Other identity
-policies that an RPC
+applied the certificate identity. Other identity policies that an RPC
 server applies without announcing them, such as mapping UID 0 to an
 unprivileged identity or deriving the group list from the server's own
 user database, fail toward lesser privilege instead.
+
+A client can confirm that a server enforces identity squashing by
+presenting a certificate that carries no identity squashing otherName
+and observing AUTH_TOOWEAK. A server that ignores the otherName gives
+the client no signal, so a client cannot distinguish a server with
+identity squashing disabled from one that does not implement this
+specification.
 
 A deployment cannot rely on the presence of these otherName fields as
 an access restriction. The restriction exists only where the server
@@ -692,14 +684,11 @@ should be terminated.
 
 ## Privacy Considerations
 
-The otherName fields defined in this specification reveal user identity information
-in the client's X.509 certificate. This information is transmitted during the TLS
-handshake and may be visible to network observers if the handshake is not properly
-protected.
-
-While TLS 1.3 encrypts most of the handshake including certificates, earlier TLS
-versions may expose this information. Deployments concerned about privacy SHOULD
-use TLS 1.3 or later.
+The otherName fields defined in this specification reveal user identity
+information in the client's X.509 certificate, which is transmitted
+during the TLS handshake. {{Section 5 of RFC9289}} forbids negotiating
+TLS versions prior to 1.3, and TLS 1.3 encrypts the client certificate,
+so a network observer does not see the identity in transit.
 
 ## Multiple Identity Formats
 
@@ -1117,10 +1106,8 @@ for their input and support.
 Special thanks to
 Area Director
 Gorry Fairhurst,
-NFSV4 Working Group Chairs
-Brian Pawlowski
-and
-Christopher Inacio,
+NFSV4 Working Group Chair
+Brian Pawlowski,
 and
 NFSV4 Working Group Secretary
 Thomas Haynes
