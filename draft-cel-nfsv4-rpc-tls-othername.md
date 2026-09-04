@@ -357,9 +357,27 @@ defined in {{sec-asn1}}.
 The otherName value for AUTH_SYS identities contains an RPCAuthSys
 structure as defined in {{sec-asn1}}. This structure consists
 of a 32-bit unsigned integer specifying a numeric UID, and a sequence
-of 32-bit unsigned integers specifying numeric GIDs.
+of 32-bit unsigned integers specifying numeric GIDs. The integers
+have the meaning that the AUTH_SYS authentication flavor gives them
+in Appendix A of {{!RFC5531}}.
 
-The use of these integers is further explained in {{!RFC5531}}.
+RPCAuthSys names an identity in the terms AUTH_SYS uses. It is not an
+AUTH_SYS credential, and a server does not build an authsys_parms
+structure from it. The per-call stamp and the machinename fields of
+authsys_parms are therefore absent, since a stamp has no meaning in a
+certificate and TLS has already authenticated the client host.
+
+The first element of gids is the effective GID. Any further elements
+are supplementary GIDs. When gids is empty, the server supplies the
+effective GID and the supplementary GIDs from its own user database
+entry for the UID.
+
+The 16-element bound that {{RFC5531}} places on the gids array of
+authsys_parms does not apply, because the server derives a local
+identity rather than a wire credential. A server whose local
+representation cannot hold every GID in the sequence MUST treat the
+identity as one it cannot apply rather than silently truncate the
+list.
 
 ## GSS-API Principals
 
@@ -456,7 +474,10 @@ When generating certificates, consider these guidelines:
 
 UID/GID values
 : Ensure that the numeric values in RPCAuthSys correspond to valid entries
-  in the server's user database. Avoid using privileged UIDs (such as 0 for
+  in the server's user database. List the effective GID first, followed
+  by any supplementary GIDs, or leave gids empty to have the server
+  supply the groups from its own user database. Avoid using privileged
+  UIDs (such as 0 for
   root) unless there is a specific operational requirement and strong
   authorization controls are in place.
 
@@ -625,7 +646,7 @@ Servers SHOULD NOT accept exported names from GSS-API mechanisms they do not
 fully support, as improper name handling could lead to authorization bypass
 vulnerabilities.
 
-#### AUTH_SYS Credentials
+#### AUTH_SYS Identities
 
 When processing RPCAuthSys otherName values, servers MUST:
 
@@ -748,12 +769,14 @@ id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
 -- OID for RPC AUTH_SYS credentials in otherName
 id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
 
--- RPC AUTH_SYS Credentials Structure
--- UID and GID list as used in RPC AUTH_SYS authentication flavor
--- See RFC 5531 (ONC RPC) and related specifications
+-- RPC AUTH_SYS Identity Structure
+-- UID and GID list in the terms of the RPC AUTH_SYS authentication
+-- flavor, RFC 5531 Appendix A.  Not an AUTH_SYS credential: the
+-- stamp and machinename fields are absent and gids is unbounded.
 RPCAuthSys ::= SEQUENCE {
     uid        INTEGER (0..4294967295),  -- 32-bit UID
-    gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs
+    gids       SEQUENCE OF INTEGER (0..4294967295)
+               -- Effective GID first, then supplementary GIDs
 }
 
 -- For use in SubjectAltName otherName
@@ -871,8 +894,8 @@ as defined by the Kerberos V5 mechanism. The first four bytes
 
 ## RPC AUTH_SYS Example
 
-This example shows a certificate containing UID 1000 and GIDs
-1000, 10, and 100:
+This example shows a certificate containing UID 1000, effective GID
+1000, and supplementary GIDs 10 and 100:
 
 ~~~ asn.1
 SubjectAltName ::= SEQUENCE {
@@ -1011,6 +1034,9 @@ Input:
 
 - uid: 500
 - gids: (empty)
+
+The server supplies the effective GID and supplementary GIDs from its
+own user database entry for UID 500.
 
 Expected DER encoding:
 
