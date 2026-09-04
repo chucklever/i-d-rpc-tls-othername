@@ -763,9 +763,9 @@ id-pkix OBJECT IDENTIFIER ::=
 
 id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
 
--- ===================================================================
+-- ================================================================
 -- RPC AUTH_SYS Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for RPC AUTH_SYS credentials in otherName
 id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
@@ -785,9 +785,9 @@ rpcAuthSys OTHER-NAME ::= {
     RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
 }
 
--- ===================================================================
+-- ================================================================
 -- GSS-API Exported Name Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for GSS-API Exported Name in otherName
 id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
@@ -796,7 +796,7 @@ id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
 -- As defined in RFC 2743 Section 3.2
 GSSExportedName ::= SEQUENCE {
     nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
-    nameValue  OCTET STRING        -- Mechanism-specific exported name
+    nameValue  OCTET STRING        -- Mechanism-specific name
 }
 
 -- For use in SubjectAltName otherName
@@ -804,9 +804,9 @@ gssExportedName OTHER-NAME ::= {
     GSSExportedName IDENTIFIED BY id-on-gssExportedName
 }
 
--- ===================================================================
+-- ================================================================
 -- NFSv4 User@Domain Principal Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for NFSv4 user@domain principal in otherName
 id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
