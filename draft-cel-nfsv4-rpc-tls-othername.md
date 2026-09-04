@@ -120,11 +120,21 @@ with type-id values defined in this document. Other SubjectAltName entries
 are used for their normal purposes (such as hostname verification for TLS).
 
 This document specifies new uses of the otherName field to carry an
-RPC user identity. The receiving system (an RPC server) then
-replaces the RPC user, as carried in the RPC header credential and
-verifier fields in each RPC request within the TLS session, with the
-user identity specified in the certificate used to authenticate that
-session.
+RPC user identity. For each RPC request within the TLS session that
+carries an AUTH_NONE or AUTH_SYS credential, the receiving system (an
+RPC server) replaces the RPC user asserted in that credential with
+the user identity specified in the certificate used to authenticate
+that session.
+
+Identity squashing does not apply to a request that carries an
+RPCSEC_GSS credential {{!RFC2203}}. Such a request is processed under
+the identity established by its GSS security context, which
+{{Section 4.2.1 of RFC9289}} leaves unchanged by the use of TLS. An
+RPCSEC_GSS credential carries a context handle rather than a user
+identity, and the peer that established that context has already
+proven its identity to the server. Replacing it would also discard
+the machine credential over which SP4_MACH_CRED state protection
+({{Section 18.35 of RFC8881}}) is defined.
 
 ## Server Processing of otherName Fields
 
@@ -157,7 +167,8 @@ authenticated TLS peer.
 If the server recognizes an identity squashing type-id but cannot
 validate the identity that otherName carries, or does not authorize
 its use for the authenticated TLS peer, the server MUST reject every
-non-NULL procedure on that TLS session with a reply_stat of
+non-NULL procedure on that TLS session that carries an AUTH_NONE or
+AUTH_SYS credential with a reply_stat of
 MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
 AUTH_TOOWEAK, as defined in {{Section 9 of !RFC5531}}. The server MUST
 NOT fall back to the credential carried in the RPC header. Such a
@@ -195,9 +206,12 @@ peer is permitted to use the specified identity. This might involve:
 1. If authorization succeeds, associate the extracted identity with the TLS
 session state.
 
-1. For each incoming RPC request on this TLS session, replace the credential
-information in the RPC header with the identity extracted from the certificate.
-The original credential information in the RPC header is ignored.
+1. For each incoming RPC request on this TLS session that carries an
+AUTH_NONE or AUTH_SYS credential, replace the credential information in
+the RPC header with the identity extracted from the certificate. The
+original credential information in the RPC header is ignored. A request
+that carries an RPCSEC_GSS credential is processed under its GSS security
+context, as it would be on any other TLS session.
 
 1. Process the RPC request using the squashed identity for all authorization
 and access control decisions.
@@ -360,9 +374,18 @@ RPCAuthSys
   certificate and the server's user database.
 
 GSSExportedName
-: Suitable for environments using GSS-API mechanisms like Kerberos. This
-  format fits naturally into existing GSS-API deployments but requires
-  that servers support the specific mechanism indicated by the nameType OID.
+: Suitable for servers that key user identities by GSS-API principal
+  name, such as servers already deployed with Kerberos. Because identity
+  squashing applies only to requests that carry an AUTH_NONE or AUTH_SYS
+  credential, this format names the principal under which such requests
+  execute. It does not affect requests that carry an RPCSEC_GSS
+  credential, which prove a principal of their own. One use is a host
+  whose users hold Kerberos principals but which has no keytab of its
+  own: the certificate names a service principal the server already
+  knows, so the host's non-GSS traffic executes as that principal while
+  its users' RPCSEC_GSS traffic continues under their own identities.
+  This format requires that servers support the specific mechanism
+  indicated by the nameType OID.
 
 NFSv4Principal
 : Recommended for heterogeneous environments or when human-readable
@@ -548,8 +571,11 @@ and additional strong authorization controls are in place.
 
 ## Session Binding
 
-All RPC operations within a TLS session containing an identity squashing otherName
-execute under the same user identity. Servers MUST ensure that session state
+All RPC requests within a TLS session containing an identity squashing
+otherName that carry an AUTH_NONE or AUTH_SYS credential execute under the
+same user identity. Requests that carry an RPCSEC_GSS credential execute
+under the identity of their GSS security context, and the certificate
+identity is not bound to them. Servers MUST ensure that session state
 cannot be hijacked or transferred between different TLS sessions, as this could
 allow an attacker to gain the privileges associated with the squashed identity.
 
