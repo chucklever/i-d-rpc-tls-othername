@@ -4,6 +4,7 @@ abbrev: "SunRPC x.509 Identity Squashing"
 category: std
 
 docname: draft-cel-nfsv4-rpc-tls-othername-latest
+submissiontype: IETF
 pi: [toc, sortrefs, symrefs, docmapping]
 stand_alone: yes
 v: 3
