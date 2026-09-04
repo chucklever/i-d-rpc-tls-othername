@@ -119,12 +119,23 @@ identity squashing purposes, the server examines only the otherName entries
 with type-id values defined in this document. Other SubjectAltName entries
 are used for their normal purposes (such as hostname verification for TLS).
 
-This document specifies new uses of the otherName field to carry an
-RPC user identity. For each RPC request within the TLS session that
-carries an AUTH_NONE or AUTH_SYS credential, the receiving system (an
-RPC server) replaces the RPC user asserted in that credential with
-the user identity specified in the certificate used to authenticate
-that session.
+This document specifies new uses of the otherName field to name an
+RPC user identity. The receiving system (an RPC server) derives an
+RPC user from that identity when the TLS session is established. For
+each RPC request within the TLS session that carries an AUTH_NONE or
+AUTH_SYS credential, the server executes the request under the
+derived RPC user in place of the one the credential asserts.
+
+The derivation depends on the identity form. An RPCAuthSys value
+carries a numeric UID and GIDs, and the server uses them directly.
+A GSSExportedName value names a GSS-API principal, and the server
+derives the RPC user from it as it does from the principal of an
+RPCSEC_GSS security context. An NFSv4Principal value carries a
+user@domain string, and the server resolves it through the mapping
+it applies to the NFSv4 owner attribute. A server that cannot
+derive an RPC user from the identity the certificate names is
+unable to apply the identity, and {{sec-server-processing}}
+specifies what it does then.
 
 Identity squashing does not apply to a request that carries an
 RPCSEC_GSS credential {{!RFC2203}}. Such a request is processed under
@@ -136,7 +147,7 @@ proven its identity to the server. Replacing it would also discard
 the machine credential over which SP4_MACH_CRED state protection
 ({{Section 18.35 of RFC8881}}) is defined.
 
-## Server Processing of otherName Fields
+## Server Processing of otherName Fields {#sec-server-processing}
 
 When an RPC server receives a client certificate containing a
 SubjectAltName extension, it MUST process the otherName fields as
@@ -148,7 +159,8 @@ extension.
 1. If the server finds an otherName with a type-id that matches one of
 the identity squashing OIDs defined in this document (id-on-rpcAuthSys,
 id-on-gssExportedName, or id-on-nfsv4Principal), it MUST extract
-and validate the identity information from that otherName.
+and validate the identity information from that otherName and derive
+an RPC user from it.
 
 1. If multiple identity squashing otherName fields are present in the
 same SubjectAltName extension, the server MUST reject the certificate
@@ -165,8 +177,9 @@ an identity squashing otherName field and authorizes its use for the
 authenticated TLS peer.
 
 If the server recognizes an identity squashing type-id but cannot
-validate the identity that otherName carries, or does not authorize
-its use for the authenticated TLS peer, the server MUST reject every
+validate the identity that otherName carries, cannot derive an RPC
+user from it, or does not authorize its use for the authenticated
+TLS peer, the server MUST reject every
 non-NULL procedure on that TLS session that carries an AUTH_NONE or
 AUTH_SYS credential with a reply_stat of
 MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
@@ -194,6 +207,12 @@ values (id-on-rpcAuthSys, id-on-gssExportedName, or id-on-nfsv4Principal).
 the identity information according to the ASN.1 definition for that type-id.
 If parsing fails, reject the certificate.
 
+1. Derive an RPC user from the identity. For RPCAuthSys, take the UID and
+GIDs as given. For GSSExportedName, map the principal as the server maps
+the principal of an RPCSEC_GSS context. For NFSv4Principal, resolve the
+user@domain string through the server's NFSv4 owner mapping. If the
+derivation fails, treat the identity as one the server cannot apply.
+
 1. Perform authorization checks to determine whether the authenticated TLS
 peer is permitted to use the specified identity. This might involve:
    - Consulting an access control list mapping certificate subjects to
@@ -203,13 +222,13 @@ peer is permitted to use the specified identity. This might involve:
    - Checking that the GSS-API mechanism is trusted and the principal is
      authorized
 
-1. If authorization succeeds, associate the extracted identity with the TLS
+1. If authorization succeeds, associate the derived RPC user with the TLS
 session state.
 
 1. For each incoming RPC request on this TLS session that carries an
-AUTH_NONE or AUTH_SYS credential, replace the credential information in
-the RPC header with the identity extracted from the certificate. The
-original credential information in the RPC header is ignored. A request
+AUTH_NONE or AUTH_SYS credential, execute the request under the RPC user
+derived from the certificate. The credential information in the RPC
+header is ignored. A request
 that carries an RPCSEC_GSS credential is processed under its GSS security
 context, as it would be on any other TLS session.
 
@@ -338,8 +357,18 @@ defined in {{sec-asn1}}.
 
 The otherName value contains an NFSv4Principal structure as defined in
 {{sec-asn1}}, consisting of a UTF-8 encoded user name, the
-literal "@" character, and a UTF-8 encoded domain name, as described in
-{{Section 5.9 of ?RFC8881}}.
+literal "@" character, and a UTF-8 encoded domain name. This is the
+form that {{Section 5.9 of ?RFC8881}} uses for the owner attribute.
+The string MUST contain the "@" character. {{RFC8881}} gives a
+string without "@" a meaning of its own, that no translation was
+available at the sender, which does not apply to a certificate.
+
+The server derives the RPC user by resolving the string through the
+same mapping it applies to the owner attribute. {{RFC8881}} leaves
+that mapping to the implementation, and this document does not
+specify it further. A server whose mapping does not handle the
+domain part of the string can resolve only strings whose domain
+matches its own.
 
 # Extending This Mechanism
 
@@ -391,7 +420,7 @@ NFSv4Principal
 : Recommended for heterogeneous environments or when human-readable
   identities are preferred. The user@domain format is familiar to
   administrators and supports internationalization, but requires that
-  servers perform name-to-UID mapping similar to NFSv4 identity mapping.
+  servers resolve the string through their NFSv4 owner mapping.
 
 ## Populating Identity Fields
 
@@ -528,17 +557,19 @@ A deployment cannot rely on the presence of these otherName fields as
 an access restriction. The restriction exists only where the server
 enforces it.
 
-### Name Canonicalization
+### Name Resolution
 
 #### NFSv4 Principals
 
-When processing NFSv4Principal otherName values, servers MUST apply the same
-name canonicalization and domain validation procedures described in
-{{Section 5.9 of !RFC8881}}. In particular:
-
-- Domain names SHOULD be validated against expected domain suffixes
-- Internationalized domain names MUST be properly normalized
-- Case-sensitivity rules for usernames and domains MUST be consistently applied
+When processing NFSv4Principal otherName values, servers MUST resolve
+the string through the same mapping they apply to the NFSv4 owner
+attribute, and MUST treat a string that mapping cannot resolve as an
+identity the server cannot apply. {{RFC8881}} does not specify that
+mapping, so how the domain is validated, how an internationalized
+domain name is normalized, and whether names are case-sensitive are
+properties of the server's mapping. Applying one mapping to both the
+certificate and the owner attribute keeps a given string resolving to
+one local identity on a given server.
 
 #### GSS-API Exported Names
 
@@ -550,6 +581,11 @@ When processing GSSExportedName otherName values, servers MUST verify that:
   specific GSS-API mechanism
 - The mechanism-specific name validation and canonicalization procedures are
   followed
+
+Servers MUST derive the RPC user from the exported name as they derive
+it from the principal of an RPCSEC_GSS security context established
+under the same mechanism, and MUST treat a name that derivation cannot
+map as an identity the server cannot apply.
 
 Servers SHOULD NOT accept exported names from GSS-API mechanisms they do not
 fully support, as improper name handling could lead to authorization bypass
@@ -718,7 +754,7 @@ gssExportedName OTHER-NAME ::= {
 id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
 
 -- NFSv4 User@Domain Principal Structure
--- As defined in RFC 8881 Section 5.9
+-- In the form RFC 8881 Section 5.9 uses for the owner attribute
 NFSv4Principal ::= SEQUENCE {
     principal  UTF8String          -- user@domain string
 }
@@ -974,7 +1010,9 @@ Input (malformed):
 
 - principal: "aliceexample.com" (no '@' character present)
 
-Expected result: Rejection by server (invalid principal string format)
+Expected result: Rejection by server (invalid principal string format).
+In RFC 8881 a string without '@' signifies that no translation was
+available at the sender, so a server has nothing to resolve.
 
 Test Case 2: RPCAuthSys with UID exceeding 32-bit range
 
