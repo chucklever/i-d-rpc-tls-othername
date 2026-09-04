@@ -1413,8 +1413,8 @@ a single assigned user identity. Kerberos is poorly suited here:
 TGTs expire in hours, yet the service may run for much longer. This
 extension lets the client convey that identity in the certificate,
 which does not expire on the same short cycle as a TGT.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
-<p id="section-1.2-5">When an RPC server replaces incoming RPC user identities with a single
-user identity, for brevity we refer to this as "identity squashing".<a href="#section-1.2-5" class="pilcrow">¶</a></p>
+<p id="section-1.2-5">This document calls the replacement of incoming RPC user identities
+with a single user identity "identity squashing".<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="summary-of-proposed-solution">
@@ -1463,8 +1463,8 @@ identity squashing purposes, the server examines only the otherName entries
 with type-id values defined in this document. Other SubjectAltName entries
 are used for their normal purposes (such as hostname verification for TLS).<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">This document specifies new uses of the otherName field to name an
-RPC user identity. The receiving system (an RPC server) derives an
-RPC user from that identity when the TLS session is established. For
+RPC user identity. The RPC server derives an RPC user from that
+identity when the TLS session is established. For
 each RPC request within the TLS session that carries an AUTH_NONE or
 AUTH_SYS credential, the server executes the request under the
 derived RPC user in place of the one the credential asserts.<a href="#section-3-4" class="pilcrow">¶</a></p>
@@ -1527,11 +1527,11 @@ authenticated TLS peer.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">If the server recognizes an identity squashing type-id but cannot
 validate the identity that otherName carries, cannot derive an RPC
 user from it, or does not authorize its use for the authenticated
-TLS peer, the server <span class="bcp14">MUST</span> reject every
-non-NULL procedure on that TLS session that carries an AUTH_NONE or
-AUTH_SYS credential with a reply_stat of
-MSG_DENIED, a reject_stat of AUTH_ERROR, and an auth_stat of
-AUTH_TOOWEAK, as defined in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-9" class="relref">Section 9</a> of [<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>. The server <span class="bcp14">MUST NOT</span> fall back to the credential carried in the RPC header. Such a
+TLS peer, the server <span class="bcp14">MUST</span> reject every non-NULL procedure on that TLS
+session that carries an AUTH_NONE or AUTH_SYS credential with a
+reply_stat of MSG_DENIED, a reject_stat of AUTH_ERROR, and an
+auth_stat of AUTH_TOOWEAK, as defined in <span><a href="https://rfc-editor.org/rfc/rfc5531#section-9" class="relref">Section 9</a> of [<a href="#RFC5531" class="cite xref">RFC5531</a>]</span>.
+The server <span class="bcp14">MUST NOT</span> fall back to the credential carried in the RPC header. Such a
 fallback would grant the client the access its header credential
 asserts, which is the access the certificate was meant to withhold.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 </section>
@@ -1623,14 +1623,10 @@ session state.<a href="#section-3.3-3.6.1" class="pilcrow">¶</a></p>
           <li id="section-3.3-3.7">
             <p id="section-3.3-3.7.1">For each incoming RPC request on this TLS session that carries an
 AUTH_NONE or AUTH_SYS credential, execute the request under the RPC user
-derived from the certificate. The credential information in the RPC
-header is ignored. A request
-that carries an RPCSEC_GSS credential is processed under its GSS security
-context, as it would be on any other TLS session.<a href="#section-3.3-3.7.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-3.3-3.8">
-            <p id="section-3.3-3.8.1">Process the RPC request using the squashed identity for all authorization
-and access control decisions.<a href="#section-3.3-3.8.1" class="pilcrow">¶</a></p>
+derived from the certificate, for all authorization and access control
+decisions. The credential information in the RPC header is ignored. A
+request that carries an RPCSEC_GSS credential is processed under its GSS
+security context, as it would be on any other TLS session.<a href="#section-3.3-3.7.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-3.3-4">Parsing and validating the certificate once at TLS session establishment
@@ -1642,7 +1638,7 @@ and caching the result avoids per-request overhead.<a href="#section-3.3-4" clas
         <h3 id="name-interoperability-with-non-s">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-interoperability-with-non-s" class="section-name selfRef">Interoperability with Non-Supporting Servers</a>
         </h3>
-<p id="section-3.4-1">RPC servers that do not implement this specification will not recognize
+<p id="section-3.4-1">RPC servers that do not implement this specification do not recognize
 the otherName OIDs defined in this document. <span><a href="https://rfc-editor.org/rfc/rfc5280#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>
 requires a certificate-using system to reject a certificate that carries
 an unrecognized critical extension, and permits it to ignore an
@@ -1844,24 +1840,22 @@ that spans other RPC services chooses one of the other two.<a href="#section-3.9
       <h2 id="name-extending-this-mechanism">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-extending-this-mechanism" class="section-name selfRef">Extending This Mechanism</a>
       </h2>
-<p id="section-4-1">It is possible that in the future, RPC servers might implement other forms
-of RPC user identity, such as Windows Security Identifiers.
-This section describes how standards action can extend the mechanism
-specified in this document to accommodate new forms of user identity.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Documents that extend this mechanism using Standards Action <span class="bcp14">MUST</span> satisfy
-the following requirements:<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-1">RPC servers might in future implement other forms of RPC user
+identity, such as Windows Security Identifiers. Standards Action can
+extend the mechanism specified in this document to a new form. A
+document that defines a new identity type:<a href="#section-4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-3.1">
-          <p id="section-4-3.1.1">New identity types <span class="bcp14">MUST</span> define an ASN.1 module.<a href="#section-4-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4-2.1">
+          <p id="section-4-2.1.1"><span class="bcp14">MUST</span> define an ASN.1 module.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-4-3.2">
-          <p id="section-4-3.2.1">New identity types <span class="bcp14">MUST</span> request an IANA OID allocation.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-4-2.2">
+          <p id="section-4-2.2.1"><span class="bcp14">MUST</span> request an IANA OID allocation.<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-4-3.3">
-          <p id="section-4-3.3.1">New identity types <span class="bcp14">SHOULD</span> provide security considerations specific to that identity type.<a href="#section-4-3.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-4-2.3">
+          <p id="section-4-2.3.1"><span class="bcp14">SHOULD</span> provide security considerations specific to that identity type.<a href="#section-4-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-4-3.4">
-          <p id="section-4-3.4.1">New identity types <span class="bcp14">SHOULD</span> provide examples and test vectors.<a href="#section-4-3.4.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-4-2.4">
+          <p id="section-4-2.4.1"><span class="bcp14">SHOULD</span> provide examples and test vectors.<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1893,17 +1887,15 @@ certificate and the server's user database.<a href="#section-5.1-2.2.1" class="p
 <dt id="section-5.1-2.3">GSSExportedName</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-2.4">
             <p id="section-5.1-2.4.1">Suitable for servers that key user identities by GSS-API principal
-name, such as servers already deployed with Kerberos. Because identity
-squashing applies only to requests that carry an AUTH_NONE or AUTH_SYS
-credential, this format names the principal under which such requests
-execute. It does not affect requests that carry an RPCSEC_GSS
-credential, which prove a principal of their own. One use is a host
-whose users hold Kerberos principals but which has no keytab of its
-own: the certificate names a service principal the server already
-knows, so the host's non-GSS traffic executes as that principal while
-its users' RPCSEC_GSS traffic continues under their own identities.
-This format requires that servers support the specific mechanism
-indicated by the nameType OID.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+name, such as servers already deployed with Kerberos. Identity
+squashing applies only to AUTH_NONE and AUTH_SYS requests, so this
+format names the principal those requests execute under and leaves
+RPCSEC_GSS requests, which prove a principal of their own, untouched.
+One use is a host with no keytab whose users hold Kerberos principals:
+the certificate names a service principal the server already knows, so
+the host's non-GSS traffic executes as that principal while its users'
+RPCSEC_GSS traffic keeps their own identities. Servers must support
+the mechanism indicated by the nameType OID.<a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.1-2.5">NFSv4Principal</dt>
@@ -1931,10 +1923,9 @@ apply it.<a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
             <p id="section-5.2-2.2.1">Ensure that the numeric values in RPCAuthSys correspond to valid entries
 in the server's user database. List the effective GID first, followed
 by any supplementary GIDs, or leave gids empty to have the server
-supply the groups from its own user database. Avoid using privileged
-UIDs (such as 0 for
-root) unless there is a specific operational requirement and strong
-authorization controls are in place.<a href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
+supply the groups from its own user database. Avoid privileged UIDs
+(such as 0 for root) unless there is a specific operational
+requirement and strong authorization controls are in place.<a href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.2-2.3">GSS-API exported names</dt>
@@ -1963,9 +1954,9 @@ International domain names should be encoded in UTF-8, not in Punycode
         </h3>
 <p id="section-5.3-1">Certificates containing identity squashing otherName fields grant access
 to server resources under a specific user identity. Administrators should
-consider appropriate validity periods based on their security requirements.
-Shorter validity periods reduce the window of exposure if a certificate is
-compromised, but may increase operational overhead for certificate renewal.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+choose validity periods to suit their security requirements. Shorter
+validity periods reduce the window of exposure if a certificate is
+compromised, but increase the operational overhead of renewal.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2">Administrators should also factor in how quickly certificate revocation
 (CRL or OCSP) propagates in their environment, since that affects how
 long a compromised certificate remains usable after revocation.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
@@ -2104,19 +2095,19 @@ not verified.<a href="#section-7.2.3-1" class="pilcrow">¶</a></p>
 administrator who issues these certificates expecting access to be
 confined to one identity gets no such confinement from a server that
 does not enforce it, and the client cannot tell whether the server
-applied the certificate identity. A client can confirm that a server
-enforces identity squashing by presenting a certificate that carries
-no identity squashing otherName and observing AUTH_TOOWEAK. A server
-that ignores the otherName gives the client no signal, so a client
-cannot distinguish a server with identity squashing disabled from
-one that does not implement this specification. Other identity
-policies that an RPC
+applied the certificate identity. Other identity policies that an RPC
 server applies without announcing them, such as mapping UID 0 to an
 unprivileged identity or deriving the group list from the server's own
 user database, fail toward lesser privilege instead.<a href="#section-7.2.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.2.3-3">A deployment cannot rely on the presence of these otherName fields as
+<p id="section-7.2.3-3">A client can confirm that a server enforces identity squashing by
+presenting a certificate that carries no identity squashing otherName
+and observing AUTH_TOOWEAK. A server that ignores the otherName gives
+the client no signal, so a client cannot distinguish a server with
+identity squashing disabled from one that does not implement this
+specification.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.2.3-4">A deployment cannot rely on the presence of these otherName fields as
 an access restriction. The restriction exists only where the server
-enforces it.<a href="#section-7.2.3-3" class="pilcrow">¶</a></p>
+enforces it.<a href="#section-7.2.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="name-resolution">
@@ -2228,13 +2219,11 @@ should be terminated.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
         <h3 id="name-privacy-considerations">
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
         </h3>
-<p id="section-7.5-1">The otherName fields defined in this specification reveal user identity information
-in the client's X.509 certificate. This information is transmitted during the TLS
-handshake and may be visible to network observers if the handshake is not properly
-protected.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">While TLS 1.3 encrypts most of the handshake including certificates, earlier TLS
-versions may expose this information. Deployments concerned about privacy <span class="bcp14">SHOULD</span>
-use TLS 1.3 or later.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-1">The otherName fields defined in this specification reveal user identity
+information in the client's X.509 certificate, which is transmitted
+during the TLS handshake. <span><a href="https://rfc-editor.org/rfc/rfc9289#section-5" class="relref">Section 5</a> of [<a href="#RFC9289" class="cite xref">RFC9289</a>]</span> forbids negotiating
+TLS versions prior to 1.3, and TLS 1.3 encrypts the client certificate,
+so a network observer does not see the identity in transit.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multiple-identity-formats">
@@ -2434,9 +2423,9 @@ id-pkix OBJECT IDENTIFIER ::=
 
 id-on OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other names
 
--- ===================================================================
+-- ================================================================
 -- RPC AUTH_SYS Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for RPC AUTH_SYS credentials in otherName
 id-on-rpcAuthSys OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2456,9 +2445,9 @@ rpcAuthSys OTHER-NAME ::= {
     RPCAuthSys IDENTIFIED BY id-on-rpcAuthSys
 }
 
--- ===================================================================
+-- ================================================================
 -- GSS-API Exported Name Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for GSS-API Exported Name in otherName
 id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2467,7 +2456,7 @@ id-on-gssExportedName OBJECT IDENTIFIER ::= { id-on TBD }
 -- As defined in RFC 2743 Section 3.2
 GSSExportedName ::= SEQUENCE {
     nameType   OBJECT IDENTIFIER,  -- GSS-API mechanism OID
-    nameValue  OCTET STRING        -- Mechanism-specific exported name
+    nameValue  OCTET STRING        -- Mechanism-specific name
 }
 
 -- For use in SubjectAltName otherName
@@ -2475,9 +2464,9 @@ gssExportedName OTHER-NAME ::= {
     GSSExportedName IDENTIFIED BY id-on-gssExportedName
 }
 
--- ===================================================================
+-- ================================================================
 -- NFSv4 User@Domain Principal Identity Squashing
--- ===================================================================
+-- ================================================================
 
 -- OID for NFSv4 user@domain principal in otherName
 id-on-nfsv4Principal OBJECT IDENTIFIER ::= { id-on TBD }
@@ -2831,10 +2820,8 @@ for their input and support.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <p id="appendix-C-2">Special thanks to
 Area Director
 Gorry Fairhurst,
-NFSV4 Working Group Chairs
-Brian Pawlowski
-and
-Christopher Inacio,
+NFSV4 Working Group Chair
+Brian Pawlowski,
 and
 NFSV4 Working Group Secretary
 Thomas Haynes
