@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-03T01:40:04.989968+00:00",
+  "timestamp": "2026-09-06T01:29:24.734187+00:00",
   "repo": "chucklever/i-d-rpc-tls-othername",
   "labels": [
     {
@@ -62,7 +62,7 @@
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 \u00a73 specifies the credential replacement over every request on the session:\n\n```\n   The receiving system (an RPC server) then\n   replaces the RPC user, as carried in the RPC header credential and\n   verifier fields in each RPC request within the TLS session, with the\n   user identity specified in the certificate used to authenticate that\n   session.\n```\n\n\u00a73.2 step 6 repeats it, and adds that the original credential is discarded:\n\n```\n   6.  For each incoming RPC request on this TLS session, replace the\n       credential information in the RPC header with the identity\n       extracted from the certificate.  The original credential\n       information in the RPC header is ignored.\n```\n\nNothing scopes the replacement to particular authentication flavors. \"RPCSEC\" appears nowhere in -03, and `git log -S RPCSEC` over the draft source returns no commit in any revision.\n\nRFC 9289 \u00a74.2.1 goes the other way for GSS sessions:\n\n```\n   Authentication of RPCSEC_GSS users is unchanged by the use of TLS.\n```\n\nSP4_MACH_CRED is defined over an RPCSEC_GSS machine credential, so a server that replaces that credential removes what the state protection is defined over. Rick Macklem raised the interaction on the nfsv4 list on 19 March 2024, together with a possible SP4_MACH_CRED_RPC to resolve it; neither has been carried into any revision. https://mailarchive.ietf.org/arch/msg/nfsv4/BTubpDlJyAW0lkupFZPCyRV_RWg\n\nState which authentication flavors squashing applies to. If AUTH_SYS and AUTH_NONE only, say so in \u00a73, and say what a server does when an RPCSEC_GSS request arrives on a session whose certificate carries a squashing otherName.\n",
       "createdAt": "2026-08-21T16:40:27Z",
-      "updatedAt": "2026-08-31T21:39:55Z",
+      "updatedAt": "2026-09-04T19:54:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -78,6 +78,13 @@
           "body": "Currently, it ignores any RPCSEC_GSS context and maps it,\nbut I am fine with only AUTH_SYS and AUTH_NONE being\nreplaced by the squashing credentials.\n\nI will simply patch the FreeBSD server, which is no problem\nat this point in time.\n",
           "createdAt": "2026-08-31T21:39:55Z",
           "updatedAt": "2026-08-31T21:39:55Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in 35f8ad824061. Identity squashing now applies to requests carrying an AUTH_NONE or AUTH_SYS credential. An RPCSEC_GSS request is processed under its GSS security context, per Section 4.2.1 of RFC 9289, with RFC 2203 added as a normative reference. The Session Binding claim is narrowed to squashed requests, and the GSSExportedName guidance now describes the no-keytab host use case.\n\nOne consequence not discussed here: the AUTH_TOOWEAK rejection from #5 takes the same scope, so an RPCSEC_GSS request on a session whose certificate identity cannot be applied still executes under its own context. Rick, does that match what you would expect the FreeBSD server to do once you patch it?",
+          "createdAt": "2026-09-04T19:54:03Z",
+          "updatedAt": "2026-09-04T19:54:03Z"
         }
       ]
     },
@@ -93,7 +100,7 @@
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 \u00a71.2 states the purpose of the mechanism as a restriction:\n\n```\n   This extension allows a\n   server to restrict access from such a client to a single user\n   identity, limiting exposure if that certificate is compromised.\n```\n\n\u00a73.3 describes what happens when the restriction is not applied:\n\n```\n   RPC servers that do not implement this specification will not\n   recognize the otherName OIDs defined in this document.  Such servers\n   MUST ignore unrecognized otherName entries per Section 4.2.1.6 of\n   [RFC5280].  These servers will process RPC requests using the\n   credential information contained in the RPC header, subject to their\n   normal authentication and authorization policies.\n```\n\nFor AUTH_SYS the RPC header credential is client-asserted and unverified, so the outcome grants more privilege than the certificate would have: an administrator who issues squashing certificates believing access is confined to one identity gets, against such a server, whatever UID the client sends. -03 defines no way for a client to learn which regime is in force.\n\nRFC 9289 \u00a76.1.1 gives a second path to the same state:\n\n```\n   The initial AUTH_TLS probe occurs in cleartext.  An on-path attacker\n   can alter a cleartext handshake to make it appear as though TLS\n   support is not available on one or both peers.\n```\n\nRFC 9289 \u00a76.1.1 offers client policies that mitigate the attack, and -03 requires neither of them. \"downgrade\", \"fallback\", \"STRIPTLS\" and \"opportunistic\" appear nowhere in the document.\n\nSay that identity squashing requires a client policy that mandates TLS, and state what a client may assume when it cannot confirm the server applied the certificate identity. If no signal is possible, say so, and say that the failure is toward greater privilege.\n",
       "createdAt": "2026-08-21T16:44:46Z",
-      "updatedAt": "2026-08-31T21:55:48Z",
+      "updatedAt": "2026-09-04T19:54:06Z",
       "closedAt": null,
       "comments": [
         {
@@ -109,6 +116,13 @@
           "body": "Normally, the FreeBSD server is configured to fail the\nRPCs with weakauth when identity squashing is required\nfor either a non-TLS session or one where the X.509\ncert. does not have an otherName that maps to a\nuser credential on the server.\n(Would be for AUTH_SYS or AUTH_NONE, if you choose\nto exempt RPCSEC_GSS.)\n\nI've never thought of the case where identity squashing\nis not required, but there is a TLS session where the X.509\ncertificate has an otherName field.\nThe alternatives seem to be..\n1 - Fail all non-NULL RPCs with weakauth.\n2 - Do the identity squashing.\n3 - Ignore the otherName and don't do identity squashing.\nServers that do not know how to do identity squashing\nwill do #3, so maybe that is the preferred response when\nidentity squashing is not required by the server?\n--> I think a server should either require it or ignore/not do it.\n\nYou could argue that, if a client wants to know if\nidentity squashing is required/being done, it can\ntry a TLS session without the cert. with a valid otherName\nand see if \"weakauth\" is replied.\n\n- \n\n",
           "createdAt": "2026-08-31T21:55:48Z",
           "updatedAt": "2026-08-31T21:55:48Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nRick's require-or-ignore point is now in e61bdc70ffd5 as a Server Policy section. A server that implements this specification either enforces identity squashing or has it disabled, at a scope the server chooses. Disabled means ignore the otherName and behave as a non-supporting server, which a client cannot distinguish. Enforcing means AUTH_TOOWEAK on every non-NULL AUTH_NONE or AUTH_SYS request on a connection where no certificate identity was applied: no TLS session, no certificate, no squashing otherName, or an otherName the server cannot apply.\n\nThe no-TLS case is a MUST, so enforcing squashing on an export means refusing cleartext AUTH_SYS on it. That is what Rick describes FreeBSD doing when squashing is required, and it is what makes the client-side STRIPTLS requirement hold from the server side. Rick, is there a deployment where you would want squashing required and cleartext AUTH_SYS accepted on the same export? If so this should be a SHOULD.\n\nThe same commit fixes the Absence of Enforcement section, which said a server that does not authorize the identity falls back to the header credential. The AUTH_TOOWEAK rule forbids that, so it now names the disabled server as the one that falls through. Rick's probe, presenting a certificate with no squashing otherName and looking for AUTH_TOOWEAK, is noted there as the way a client confirms enforcement.",
+          "createdAt": "2026-09-04T19:54:06Z",
+          "updatedAt": "2026-09-04T19:54:06Z"
         }
       ]
     },
@@ -124,7 +138,7 @@
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 Appendix A defines the structure with two identity fields:\n\n```\n   RPCAuthSys ::= SEQUENCE {\n       uid        INTEGER (0..4294967295),  -- 32-bit UID\n       gids       SEQUENCE OF INTEGER (0..4294967295)  -- List of 32-bit GIDs\n   }\n```\n\n\u00a73.4.2 describes it the same way, and refers the meaning of the integers to RFC 5531:\n\n```\n   The otherName value for AUTH_SYS identities contains an RPCAuthSys\n   structure as defined in Appendix A.  This structure consists of a\n   32-bit unsigned integer specifying a numeric UID, and a sequence of\n   32-bit unsigned integers specifying numeric GIDs.\n```\n\nRFC 5531 Appendix A has three identity fields, and distinguishes the effective group ID from the supplementary list:\n\n```\n      struct authsys_parms {\n         unsigned int stamp;\n         string machinename<255>;\n         unsigned int uid;\n         unsigned int gid;\n         unsigned int gids<16>;\n      };\n```\n\n```\n   The \"uid\" is the caller's effective user ID.  The \"gid\"\n   is the caller's effective group ID.  \"gids\" are a counted array of\n   groups that contain the caller as a member.\n```\n\nA server building an AUTH_SYS credential from an RPCAuthSys value has no field for the effective GID. One implementation takes gids[0] as the effective GID and the rest as supplementary; another treats the whole list as supplementary and supplies an effective GID from its own user database. The two authorize differently against group-owned files from the same certificate. Appendix B.6.2 Test Case 2 reaches the case where neither reading works: uid 500 with an empty GID list yields no effective GID at all.\n\nThe 16-element bound is also absent, since SEQUENCE OF INTEGER carries no SIZE constraint. A certificate carrying 40 GIDs is well-formed under -03 and cannot be represented in the credential RFC 5531 defines. The bound was in the text and was removed in caeecf3d18c8, the -00 commit, which replaced \"up to 16 numeric GIDs\" with \"a counted list of 32-bit integers that specify numeric GIDs\"; that commit is otherwise about adding the Kerberos identity form and records no reason for the change.\n\nAdd an effective-GID field, or say which element of gids is the effective GID. Say whether the 16-element AUTH_SYS limit applies, and what a server does with a longer list.\n",
       "createdAt": "2026-08-21T16:46:28Z",
-      "updatedAt": "2026-08-31T22:01:37Z",
+      "updatedAt": "2026-09-04T19:54:07Z",
       "closedAt": null,
       "comments": [
         {
@@ -140,6 +154,13 @@
           "body": "I would say that the \"name@domain\" maps to whatever the\nserver chooses. (I don't see any need to mention POSIX specifics?)\n\nSomething like \"the name@domain is mapped to that user\nidentity on the server\".",
           "createdAt": "2026-08-31T22:01:37Z",
           "updatedAt": "2026-08-31T22:01:37Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in cf856fd07465 under the identity reading. RPCAuthSys names an identity in the terms AUTH_SYS uses and is not an AUTH_SYS credential, which is why stamp and machinename are absent. The first element of gids is the effective GID and the rest are supplementary. An empty list means the server supplies the groups from its own user database, which is what Rick describes the FreeBSD server doing for every form. The 16-element bound does not apply, since no wire credential is built. A server whose local representation cannot hold the whole list treats the identity as one it cannot apply rather than truncating it, so a certificate never silently confers a narrower identity than it names.\n\nRick's comment here answered the user@domain mapping question, which is now handled in #6. This issue was about the structure in the certificate, and FreeBSD has no code for this form, so the reading above is a choice rather than a description of running code. Objections welcome.",
+          "createdAt": "2026-09-04T19:54:07Z",
+          "updatedAt": "2026-09-04T19:54:07Z"
         }
       ]
     },
@@ -148,15 +169,15 @@
       "id": "I_kwDOPQ4GcM8AAAABNuokTA",
       "title": "Squashing assumes one RPC user per TLS session, and nothing establishes that",
       "url": "https://github.com/chucklever/i-d-rpc-tls-othername/issues/4",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "chucklever",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 \u00a71.2 quotes RFC 9289 \u00a74.2 as the problem statement, including the sentence saying the property cannot be checked:\n\n```\n   When a client presents a TLS\n   peer identity to an RPC server, the protocol extension described in\n   the current document provides no way for the server to know whether\n   that identity represents one RPC user on that client or is shared\n   amongst many RPC users.\n```\n\nThe mechanism is then specified without that condition attached. \u00a77.3:\n\n```\n   All RPC operations within a TLS session containing an identity\n   squashing otherName execute under the same user identity.\n```\n\nThe justification for treating the property as satisfied is a deployment observation, in \u00a71.2:\n\n```\n   Mobile devices such as laptops are typically used by a single user\n   and do not have a fixed, well-known IP address or fully qualified DNS\n   name.\n```\n\nNothing turns the observation into a restriction on where the mechanism may be used.\n\nRFC 9289 \u00a76.2 describes the case the observation excludes:\n\n```\n   Moreover, client implementations are free to transmit RPC requests\n   for more than one RPC user using the same TLS session.  Depending on\n   the details of the client RPC implementation, this means that the\n   client's TLS credentials are potentially visible to every RPC user\n   that shares a TLS session.  Privileged users may also be able to\n   access this TLS identity.\n```\n\nUnder RFC 9289 alone, a local user who reaches the shared TLS credential still faces the server's per-user authorization. Under -03 that authorization is gone, since \u00a73.2 step 6 discards the header credential: reaching the session is the whole of the authorization, and every request on it is attributed to the person named in the certificate.\n\nNothing in -03 obliges a client to restrict a squashed session to one RPC user. The normative requirements land on the server (\u00a73.1, \u00a77.2.1, \u00a77.2.2, \u00a77.2.3, \u00a77.3, \u00a77.4), and \u00a75, which addresses CAs and administrators, opens \"This section provides non-normative guidance\". The party that knows whether it multiplexes RPC users onto one TLS session carries no obligation.\n\nState normatively that a squashing certificate is presented only on a TLS session carrying a single RPC user, and say what a client owes before presenting one. If the mechanism is meant to apply to shared sessions too, say so, and say what the co-located user and the named account holder bear.\n\nRelated to #2.\n",
       "createdAt": "2026-08-21T16:48:16Z",
-      "updatedAt": "2026-08-23T19:59:48Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-04T19:38:51Z",
+      "closedAt": "2026-09-04T19:38:51Z",
       "comments": [
         {
           "author": "chucklever",
@@ -164,6 +185,13 @@
           "body": "Drafted with AI assistance.\n\nRick confirms off-list (2026-08-21) that one RPC user per TLS session is the intent: \"Yes, it is one user per TLS session.\" He adds that the FreeBSD implementation was written for a personal device such as a laptop, where system and user are not distinct.\n\nThe confirmation settles the branch this issue left open. The mechanism is not meant to cover sessions carrying more than one RPC user, so the text to write is the normative restriction rather than a statement of what a co-located user and the named account holder bear.\n\nThe obligation belongs on the client, which is the party that knows whether it multiplexes RPC users onto one TLS session. The patch for #2 adds a Client Requirements section to \u00a73 carrying client-side normative text, and the restriction belongs there: a client MUST NOT present a certificate carrying one of these otherName fields on a TLS session over which it transmits RPC requests for more than one RPC user.\n\nSection 6.2 of RFC 9289 remains the reason to state it. A client that multiplexes exposes its TLS credential to every RPC user sharing the session, and under this extension reaching the session is the whole of the authorization.\n",
           "createdAt": "2026-08-23T19:59:48Z",
           "updatedAt": "2026-08-23T19:59:48Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in 1874a67b1988, which adds a Client Requirements section: a client MUST NOT present a certificate carrying one of these otherName fields on a TLS session over which it transmits RPC requests for more than one RPC user. That is the normative restriction Rick's off-list confirmation of one user per session called for.",
+          "createdAt": "2026-09-04T19:38:50Z",
+          "updatedAt": "2026-09-04T19:38:50Z"
         }
       ]
     },
@@ -172,15 +200,15 @@
       "id": "I_kwDOPQ4GcM8AAAABNupWWg",
       "title": "The interoperability claim in \u00a73.3 rests on a rule RFC 5280 \u00a74.2.1.6 does not contain",
       "url": "https://github.com/chucklever/i-d-rpc-tls-othername/issues/5",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "chucklever",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 \u00a73.3:\n\n```\n   RPC servers that do not implement this specification will not\n   recognize the otherName OIDs defined in this document.  Such servers\n   MUST ignore unrecognized otherName entries per Section 4.2.1.6 of\n   [RFC5280].  These servers will process RPC requests using the\n   credential information contained in the RPC header, subject to their\n   normal authentication and authorization policies.\n```\n\nRFC 5280 \u00a74.2.1.6 states no such rule. Its entire treatment of otherName is:\n\n```\n   The subjectAltName MAY carry additional name types through the use of\n   the otherName field.  The format and semantics of the name are\n   indicated through the OBJECT IDENTIFIER in the type-id field.  The\n   name itself is conveyed as value field in otherName.  For example,\n   Kerberos [RFC4120] format names can be encoded into the otherName,\n   using a Kerberos 5 principal name OID and a SEQUENCE of the Realm and\n   the PrincipalName.\n```\n\nThe nearest applicable rule is in RFC 5280 \u00a74.2, and it operates on whole extensions rather than on GeneralName entries within one:\n\n```\n   A certificate-using system MUST reject the certificate if it encounters\n   a critical extension it does not recognize or a critical extension\n   that contains information that it cannot process.  A non-critical\n   extension MAY be ignored if it is not recognized, but MUST be\n   processed if it is recognized.\n```\n\nThe \"if it is not recognized\" escape does not reach subjectAltName, which the same section lists as recognized:\n\n```\n   At a minimum, applications conforming to this profile MUST recognize\n   the following extensions: key usage (Section 4.2.1.3), certificate\n   policies (Section 4.2.1.4), subject alternative name (Section\n   4.2.1.6),\n```\n\nRFC 5280 supplies no rule for an unknown type-id inside a recognized subjectAltName, so \u00a73.3's fall-through is convention rather than an inherited requirement.\n\nCriticality sharpens it for the deployment \u00a71.2 describes. RFC 5280 \u00a74.2.1.6:\n\n```\n   Further, if the only subject identity included in the certificate is\n   an alternative name form (e.g., an electronic mail address), then the\n   subject distinguished name MUST be empty (an empty sequence), and the\n   subjectAltName extension MUST be present.  If the subject field\n   contains an empty sequence, then the issuing CA MUST include a\n   subjectAltName extension that is marked as critical.\n```\n\nA certificate whose only subject identity is the squashing otherName fits the laptop case in \u00a71.2 and carries a critical subjectAltName. Whether a non-supporting server then rejects it turns on whether it judges that it \"cannot process\" the extension, which RFC 5280 does not settle. -03 says nothing about criticality anywhere; the only occurrence of \"critical\" in the document is \u00a77.4's \"timely revocation is critical\".\n\nCite RFC 5280 \u00a74.2 rather than \u00a74.2.1.6, and say that GeneralName-level fall-through is convention rather than an inherited requirement. State the expected certificate profile: a non-empty subject DN and a non-critical subjectAltName, which RFC 5280 \u00a74.2.1.6 already recommends where the subject DN is non-empty.\n\nRelated to #2.\n",
       "createdAt": "2026-08-21T16:49:59Z",
-      "updatedAt": "2026-08-31T22:11:18Z",
-      "closedAt": null,
+      "updatedAt": "2026-09-04T19:38:52Z",
+      "closedAt": "2026-09-04T19:38:52Z",
       "comments": [
         {
           "author": "chucklever",
@@ -195,6 +223,13 @@
           "body": "As I noted in another comment, I think a server should either\nrequire it or ignore it, since ignoring it is what servers that\ndo not implement squashing do now.\n",
           "createdAt": "2026-08-31T22:11:18Z",
           "updatedAt": "2026-08-31T22:11:18Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in 0b9e42de0ac4. The interoperability section now cites Section 4.2 of RFC 5280 and states the GeneralName-level fall-through as this document's own requirement, requires a non-empty subject DN and a non-critical subjectAltName, and requires AUTH_TOOWEAK on every non-NULL procedure when the server recognizes the type-id but cannot apply the identity.\n\nRick's point that a server should either require squashing or ignore the otherName is about a server with the feature disabled, which the new text does not address. That is being carried in #2.",
+          "createdAt": "2026-09-04T19:38:52Z",
+          "updatedAt": "2026-09-04T19:38:52Z"
         }
       ]
     },
@@ -210,7 +245,7 @@
       "labels": [],
       "body": "Drafted with AI assistance from a review pass; quotes and citations verified against the source documents.\n\n-03 \u00a77.2.3.1, Name Canonicalization / NFSv4 Principals:\n\n```\n   When processing NFSv4Principal otherName values, servers MUST apply\n   the same name canonicalization and domain validation procedures\n   described in Section 5.9 of [RFC8881].  In particular:\n\n   *  Domain names SHOULD be validated against expected domain suffixes\n\n   *  Internationalized domain names MUST be properly normalized\n\n   *  Case-sensitivity rules for usernames and domains MUST be\n      consistently applied\n```\n\nRFC 8881 \u00a75.9 describes no such procedures:\n\n```\n   The translation used to interpret owner and group strings is not\n   specified as part of the protocol.  This allows various solutions to\n   be employed.\n```\n\nThe subordinate requirements have no referent either: -03 names no normalization form and states no case rules. Two conforming servers can canonicalize one certificate to two different local identities and authorize differently.\n\n-03 also contradicts the section it points at. \u00a73.6.2, Format of the otherName Value under NFSv4 User @ Domain String Identities:\n\n```\n   The otherName value contains an NFSv4Principal structure as defined\n   in Appendix A, consisting of a UTF-8 encoded user name, the literal\n   \"@\" character, and a UTF-8 encoded domain name, as described in\n   Section 5.9 of [RFC8881].\n```\n\nAppendix B.6.3, Invalid Test Cases, requires that a string without \"@\" be rejected:\n\n```\n   Test Case 1: NFSv4Principal with missing '@' separator\n\n   Input (malformed):\n\n   *  principal: \"aliceexample.com\" (no '@' character present)\n\n   Expected result: Rejection by server (invalid principal string\n   format)\n```\n\nRFC 8881 \u00a75.9 gives that string a defined meaning instead:\n\n```\n   In the case where there is no translation available to the client or\n   server, the attribute value will be constructed without the \"@\".\n   Therefore, the absence of the @ from the owner or owner_group\n   attribute signifies that no translation was available at the sender\n   and that the receiver of the attribute should not use that string as\n   a basis for translation into its own internal format.\n```\n\nName the normalization and case-folding rules directly rather than by reference to a section that declines to specify them, and reconcile the NFSv4 Format of the otherName Value subsection and Invalid Test Cases with RFC 8881 \u00a75.9's meaning for a string without \"@\".\n\n-02 carried a normative anchor here and -03 removed it. d7721364a099 removed a pointer to RFC 5280 \u00a77.5 on correct grounds -- \"The NFSv4Principal otherName carries a UTF-8 string and has no connection to rfc822Name encoding rules\" -- reasoning that \"The format is already described correctly in the following subsection, which cites RFC 8881 Section 5.9.\" That subsection is the NFSv4 Format of the otherName Value, and the RFC 8881 \u00a75.9 citation is the one this issue is about.\n\nSection numbers above are -03's. Patches pending for #2 and #5 insert new sections ahead of them, so the numbers shift in the next revision; the section names do not.\n",
       "createdAt": "2026-08-21T16:51:58Z",
-      "updatedAt": "2026-08-31T22:08:40Z",
+      "updatedAt": "2026-09-04T19:54:04Z",
       "closedAt": null,
       "comments": [
         {
@@ -226,6 +261,13 @@
           "body": "The FreeBSD server maps the \"name@domain\" to a uid, plus list of gids.\n(It handles the \"who\" field of NFSv4 ACLs the same way, except Owner\nis a uid and Group is a gid. In ZFS, the acl is stored with numeric uids and\ngids, not strings.)\n\nThe same is also true of Kerberized NFS. The server maps the principal\nname to what Kerberos calls an lname(), (For MIT's Kerberos implementation\nI think it always just returns the same string?)\nThen that is looked up in the password database and translated to a uid plus gid list.\n--> All three do essentially the same thing.\n(Dealing with a non-default \"domain\" is not supported.)\n",
           "createdAt": "2026-08-31T22:08:40Z",
           "updatedAt": "2026-08-31T22:08:40Z"
+        },
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in 45465439efb3, together with #7. The certificate names an identity and the server derives an RPC user from it when the TLS session is established. For NFSv4Principal the derivation is resolution through the server's NFSv4 owner mapping, which RFC 8881 leaves to the implementation, so the canonicalization bullets are gone and the section is now Name Resolution. A string the mapping cannot resolve is an identity the server cannot apply, which routes to AUTH_TOOWEAK. The format subsection requires the \"@\" character and says why RFC 8881's meaning for its absence does not apply to a certificate, and it carries the note that a server whose mapping ignores the domain resolves only its own.\n\nThe GSSExportedName section gained a parallel requirement: derive the RPC user as the server does from an RPCSEC_GSS principal under the same mechanism. That follows Rick's description of the lname path.\n\nA follow-up in a4750c70cddf points out that the user@domain form names an NFSv4 identity rather than an RPC one, since resolving it needs an owner mapping that only an NFSv4 server has. The format guidance no longer recommends it for heterogeneous environments. Rick, that reads as a layering observation to me. Do you see a non-NFS RPC server ever resolving user@domain? If so the form is generic and that commit should come out.",
+          "createdAt": "2026-09-04T19:54:04Z",
+          "updatedAt": "2026-09-04T19:54:04Z"
         }
       ]
     },
@@ -241,9 +283,17 @@
       "labels": [],
       "body": "Drafted with AI assistance under close review; RFC 2203 and RFC 5531 structures verified against the published text.\n\n-03 \u00a73 states the mechanism as credential replacement:\n\n```\n   The receiving system (an RPC server) then\n   replaces the RPC user, as carried in the RPC header credential and\n   verifier fields in each RPC request within the TLS session, with the\n   user identity specified in the certificate used to authenticate that\n   session.\n```\n\n\u00a73.2 step 6 repeats it:\n\n```\n   6.  For each incoming RPC request on this TLS session, replace the\n       credential information in the RPC header with the identity\n       extracted from the certificate.  The original credential\n       information in the RPC header is ignored.\n```\n\nReplacement is possible for one of the three identity forms. AUTH_SYS is a credential the certificate can reproduce: RFC 5531 Appendix A defines authsys_parms as stamp, machinename, uid, gid, and gids, and RPCAuthSys carries the uid and a group list.\n\nThe other two forms are names. Section 5.1 of RFC 2203 defines the RPCSEC_GSS credential:\n\n```\n              struct {\n                  rpc_gss_proc_t gss_proc;  /* control procedure */\n                  unsigned int seq_num;   /* sequence number */\n                  rpc_gss_service_t service; /* service used */\n                  opaque handle<>;       /* context handle */\n              } rpc_gss_cred_vers_1_t;\n```\n\nThe principal appears nowhere in it. A GSS name is established during context creation and held in server-side context state, so a certificate can name the principal but cannot supply what the credential carries. An NFSv4 user@domain string is not an RPC credential in any flavor; it is an upper-layer name that RFC 8881 leaves to a translation the protocol does not specify.\n\nThe ASN.1 module in Appendix A already reflects this. RPCAuthSys carries credential fields, while GSSExportedName carries a mechanism OID and a name value, and NFSv4Principal carries a UTF8String. Two of the three are names by construction. Only the prose treats the three as peers.\n\nThe verifier makes it plainer. -03 says the server replaces \"the RPC header credential and verifier fields\". For AUTH_SYS the verifier is AUTH_NONE and there is nothing to replace. For RPCSEC_GSS the verifier is a MIC computed over the header under the established context, which a certificate cannot produce.\n\nWhat a server can actually do with GSSExportedName or NFSv4Principal is resolve the name to a local identity and execute the session's requests under it. -03 never says a resolution occurs. \u00a77.2.3.1 instead specifies the NFSv4 resolution as canonicalization requirements, which is how that section came to demand procedures RFC 8881 declines to supply (#6).\n\nState the mechanism as naming and derivation rather than replacement: the certificate names an identity, and the server derives the RPC user from it. The derivation is direct for RPCAuthSys, and is a name resolution for the other two forms. Say what a server does when resolution fails, and drop the claim that the verifier is replaced.\n\nRelated to #1 and #6.\n",
       "createdAt": "2026-08-23T20:53:36Z",
-      "updatedAt": "2026-08-23T20:53:36Z",
+      "updatedAt": "2026-09-04T19:54:05Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "chucklever",
+          "authorAssociation": "OWNER",
+          "body": "Drafted with AI assistance under close review.\n\nFixed in 45465439efb3 together with #6. The mechanism section now states naming and derivation rather than replacement, the verifier claim is gone, and the derivation is given per form: direct for RPCAuthSys, the server's principal mapping for GSSExportedName, the NFSv4 owner mapping for NFSv4Principal. A failed derivation routes to the AUTH_TOOWEAK rule.",
+          "createdAt": "2026-09-04T19:54:05Z",
+          "updatedAt": "2026-09-04T19:54:05Z"
+        }
+      ]
     }
   ],
   "pulls": []
