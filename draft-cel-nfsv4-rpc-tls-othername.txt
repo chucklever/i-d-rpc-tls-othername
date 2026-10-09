@@ -5,7 +5,7 @@
 Network File System Version 4                                 R. Macklem
 Internet-Draft                                                   FreeBSD
 Intended status: Standards Track                           C. Lever, Ed.
-Expires: 9 March 2027                                   5 September 2026
+Expires: 12 April 2027                                    9 October 2026
 
 
  Remote Procedure Call Identity Squashing via x.509 Certificate Fields
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 March 2027.
+   This Internet-Draft will expire on 12 April 2027.
 
 Copyright Notice
 
@@ -1242,8 +1242,8 @@ B.6.3.  Invalid Test Cases
 
 Acknowledgments
 
-   The authors are grateful to Jeff Layton, Greg Marsden, and Martin
-   Thomson for their input and support.
+   The authors are grateful to Jeff Layton, Greg Marsden, Tom Talpey,
+   and Martin Thomson for their input and support.
 
    Special thanks to Area Director Gorry Fairhurst, NFSV4 Working Group
    Chair Brian Pawlowski, and NFSV4 Working Group Secretary Thomas
