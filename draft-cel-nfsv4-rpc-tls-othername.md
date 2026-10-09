@@ -1100,6 +1100,7 @@ Expected result: Certificate rejection per Security Considerations
 The authors are grateful to
 Jeff Layton,
 Greg Marsden,
+Tom Talpey,
 and
 Martin Thomson
 for their input and support.
